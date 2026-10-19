@@ -1,0 +1,142 @@
+{
+ "railway": [
+  "wrought_iron"
+ ],
+ "electric_car": [
+  "lead_acid_battery"
+ ],
+ "automobile": [
+  "four_stroke_engine",
+  "carburetor"
+ ],
+ "motorcycle": [
+  "four_stroke_engine",
+  "carburetor"
+ ],
+ "diesel_locomotive": [
+  "diesel_engine"
+ ],
+ "motor_ship": [
+  "diesel_engine"
+ ],
+ "turbinia": [
+  "steam_turbine"
+ ],
+ "panama_canal": [
+  "steam_shovel",
+  "dynamite",
+  "portland_cement"
+ ],
+ "city_south_london": [
+  "electric_locomotive"
+ ],
+ "scmaglev": [
+  "superconducting_magnet",
+  "niobium_titanium"
+ ],
+ "car_navigation": [
+  "gps"
+ ],
+ "ais": [
+  "gps"
+ ],
+ "ride_hailing": [
+  "gps"
+ ],
+ "scooter_sharing": [
+  "gps"
+ ],
+ "self_driving_car": [
+  "computer_vision"
+ ],
+ "darpa_grand_challenge": [
+  "gps",
+  "lidar"
+ ],
+ "lane_departure_warning": [
+  "computer_vision"
+ ],
+ "toyota_prius": [
+  "nimh_battery"
+ ],
+ "hydrogen_train": [
+  "pem_fuel_cell"
+ ],
+ "fuel_cell_vehicle": [
+  "alkaline_fuel_cell"
+ ],
+ "hot_air_balloon": [
+  "paper"
+ ],
+ "airplane": [
+  "wind_tunnel"
+ ],
+ "autopilot": [
+  "gyroscope"
+ ],
+ "attitude_indicator": [
+  "gyroscope"
+ ],
+ "explorer_1": [
+  "geiger_counter"
+ ],
+ "transit_satellite": [
+  "doppler_effect"
+ ],
+ "cryogenic_rocket_engine": [
+  "liquefaction_of_gases"
+ ],
+ "apollo_guidance_computer": [
+  "magnetic_core_memory"
+ ],
+ "hubble": [
+  "ccd"
+ ],
+ "kepler_telescope": [
+  "ccd"
+ ],
+ "chandra": [
+  "ccd"
+ ],
+ "gps": [
+  "atomic_clock"
+ ],
+ "glonass": [
+  "atomic_clock"
+ ],
+ "space_shuttle": [
+  "carbon_carbon",
+  "fly_by_wire"
+ ],
+ "boeing_787": [
+  "cfrp"
+ ],
+ "airbus_a380": [
+  "cfrp"
+ ],
+ "falcon_9": [
+  "liquid_rocket",
+  "turbopump"
+ ],
+ "evtol": [
+  "brushless_dc_motor"
+ ],
+ "starship": [
+  "stainless_steel"
+ ],
+ "electron_rocket": [
+  "electron_beam_melting"
+ ],
+ "jwst": [
+  "segmented_mirror"
+ ],
+ "x15": [
+  "superalloy"
+ ],
+ "mariner_4": [
+  "television"
+ ],
+ "luna_9": [
+  "television"
+ ]
+}

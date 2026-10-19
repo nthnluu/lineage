@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "echo no install step",
+  "buildCommand": "python3 build.py",
+  "outputDirectory": "site",
+  "headers": [
+    { "source": "/techtree.json", "headers": [{ "key": "Access-Control-Allow-Origin", "value": "*" }] }
+  ]
+}

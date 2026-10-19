@@ -1,0 +1,117 @@
+{
+ "cave_painting": [
+  "ochre_pigment"
+ ],
+ "printing_press": [
+  "metal_casting"
+ ],
+ "telegraph": [
+  "relay"
+ ],
+ "telephone": [
+  "faradays_law"
+ ],
+ "submarine_cable": [
+  "gutta_percha"
+ ],
+ "transatlantic_telegraph_cable": [
+  "gutta_percha",
+  "galvanometer"
+ ],
+ "nipkow_disk": [
+  "photoconductivity"
+ ],
+ "radio": [
+  "electromagnetic_waves",
+  "induction_coil",
+  "antenna"
+ ],
+ "amplitude_modulation": [
+  "alternator"
+ ],
+ "television": [
+  "photoelectric_effect"
+ ],
+ "iconoscope": [
+  "cathode_ray_tube",
+  "photoelectric_effect"
+ ],
+ "sound_on_film": [
+  "phototube"
+ ],
+ "xerography": [
+  "photoconductivity"
+ ],
+ "lp_record": [
+  "pvc"
+ ],
+ "telstar": [
+  "traveling_wave_tube",
+  "solar_cell"
+ ],
+ "fiber_optic_communication": [
+  "laser_diode"
+ ],
+ "compact_disc": [
+  "laser_diode",
+  "error_correction_code"
+ ],
+ "mp3": [
+  "discrete_cosine_transform"
+ ],
+ "mpeg1": [
+  "discrete_cosine_transform",
+  "huffman_coding"
+ ],
+ "smartphone": [
+  "capacitive_touchscreen",
+  "tft_lcd"
+ ],
+ "blu_ray": [
+  "gallium_nitride"
+ ],
+ "linotype": [
+  "metal_casting"
+ ],
+ "crookes_tube": [
+  "vacuum_pump"
+ ],
+ "transformer": [
+  "faradays_law"
+ ],
+ "vacuum_tube": [
+  "thermionic_emission"
+ ],
+ "semiconductor": [
+  "band_theory"
+ ],
+ "planar_process": [
+  "doping",
+  "monocrystalline_silicon"
+ ],
+ "mosfet": [
+  "monocrystalline_silicon"
+ ],
+ "light_emitting_diode": [
+  "gallium_arsenide"
+ ],
+ "laser_diode": [
+  "gallium_arsenide"
+ ],
+ "blue_led": [
+  "gallium_nitride"
+ ],
+ "wide_bandgap_power": [
+  "gallium_nitride",
+  "silicon_carbide"
+ ],
+ "euv_lithography": [
+  "laser"
+ ],
+ "neon_lighting": [
+  "air_separation"
+ ],
+ "vibrating_structure_gyroscope": [
+  "gyroscope"
+ ]
+}

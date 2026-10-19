@@ -1,0 +1,66 @@
+{
+ "mechanical_clock": [
+  "verge_escapement"
+ ],
+ "pocket_watch": [
+  "verge_escapement"
+ ],
+ "spring_scale": [
+  "hookes_law"
+ ],
+ "resistance_thermometer": [
+  "wheatstone_bridge"
+ ],
+ "bolometer": [
+  "wheatstone_bridge"
+ ],
+ "liquefaction_of_gases": [
+  "refrigeration"
+ ],
+ "mass_spectrometry": [
+  "electron"
+ ],
+ "electron_microscope": [
+  "electron"
+ ],
+ "geiger_counter": [
+  "radioactivity"
+ ],
+ "neutron_diffraction": [
+  "neutron"
+ ],
+ "laser": [
+  "maser"
+ ],
+ "superconducting_magnet": [
+  "niobium_tin"
+ ],
+ "fiber_optic_gyroscope": [
+  "optical_fiber"
+ ],
+ "ftir": [
+  "fast_fourier_transform"
+ ],
+ "spectrophotometer": [
+  "phototube"
+ ],
+ "hydraulic_press": [
+  "pascals_law"
+ ],
+ "injection_molding": [
+  "celluloid"
+ ],
+ "arc_welding": [
+  "arc_lamp"
+ ],
+ "oxy_fuel_welding": [
+  "air_separation",
+  "calcium_carbide"
+ ],
+ "statistical_process_control": [
+  "statistics"
+ ],
+ "machine_vision": [
+  "ccd"
+ ]
+}

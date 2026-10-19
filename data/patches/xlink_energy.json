@@ -1,0 +1,184 @@
+{
+ "electrolysis_of_water": [
+  "voltaic_pile"
+ ],
+ "electric_generator": [
+  "faradays_law"
+ ],
+ "oil_well": [
+  "drilling_rig"
+ ],
+ "internal_combustion_engine": [
+  "induction_coil"
+ ],
+ "heavy_water": [
+  "isotope"
+ ],
+ "nuclear_reactor": [
+  "neutron",
+  "synthetic_graphite"
+ ],
+ "enriched_uranium": [
+  "isotope",
+  "mass_spectrometry"
+ ],
+ "solar_cell": [
+  "pn_junction",
+  "monocrystalline_silicon"
+ ],
+ "pwr": [
+  "zircaloy"
+ ],
+ "hydrogen_storage": [
+  "liquefaction_of_gases"
+ ],
+ "lng": [
+  "liquefaction_of_gases"
+ ],
+ "liquid_air_storage": [
+  "liquefaction_of_gases"
+ ],
+ "smes": [
+  "superconducting_magnet",
+  "niobium_titanium"
+ ],
+ "wendelstein_7x": [
+  "superconducting_magnet",
+  "niobium_titanium"
+ ],
+ "static_var_compensator": [
+  "thyristor"
+ ],
+ "facts": [
+  "thyristor",
+  "igbt"
+ ],
+ "thin_film_solar_cell": [
+  "amorphous_silicon"
+ ],
+ "heterojunction_solar_cell": [
+  "amorphous_silicon"
+ ],
+ "multi_junction_solar_cell": [
+  "gallium_arsenide",
+  "mocvd"
+ ],
+ "lithium_ion_battery": [
+  "lithium_cobalt_oxide",
+  "lithium_battery"
+ ],
+ "nif_ignition": [
+  "laser"
+ ],
+ "three_gorges_dam": [
+  "hydroelectricity",
+  "gravity_dam"
+ ],
+ "organic_solar_cell": [
+  "conductive_polymer"
+ ],
+ "dye_sensitized_solar_cell": [
+  "titanium_dioxide"
+ ],
+ "magnox": [
+  "magnesium_alloy"
+ ],
+ "great_pyramid": [
+  "surveying",
+  "inclined_plane"
+ ],
+ "pyramid_construction": [
+  "surveying",
+  "sledge"
+ ],
+ "aqueduct": [
+  "surveying"
+ ],
+ "siloam_tunnel": [
+  "surveying"
+ ],
+ "tunnel_of_eupalinos": [
+  "surveying"
+ ],
+ "colosseum": [
+  "roman_concrete"
+ ],
+ "pantheon": [
+  "roman_concrete"
+ ],
+ "hagia_sophia": [
+  "fired_brick"
+ ],
+ "florence_cathedral": [
+  "crane_machine",
+  "fired_brick"
+ ],
+ "lightning_rod": [
+  "leyden_jar"
+ ],
+ "thames_tunnel": [
+  "steam_engine"
+ ],
+ "i_beam": [
+  "rolling_mill"
+ ],
+ "britannia_bridge": [
+  "wrought_iron",
+  "rivet"
+ ],
+ "eads_bridge": [
+  "steel"
+ ],
+ "tunnel_boring_machine": [
+  "pneumatic_tool"
+ ],
+ "brooklyn_bridge": [
+  "wire_rope"
+ ],
+ "eiffel_tower": [
+  "rivet",
+  "wrought_iron"
+ ],
+ "shotcrete": [
+  "pneumatic_tool"
+ ],
+ "bulldozer": [
+  "continuous_track"
+ ],
+ "building_insulation": [
+  "glass_fiber"
+ ],
+ "hoover_dam": [
+  "hydroelectricity"
+ ],
+ "golden_gate_bridge": [
+  "wire_rope",
+  "steel"
+ ],
+ "cable_stayed_bridge": [
+  "wire_rope"
+ ],
+ "geotextile": [
+  "pvc"
+ ],
+ "reverse_osmosis": [
+  "cellulose_acetate"
+ ],
+ "olympiastadion_munich": [
+  "pmma",
+  "wire_rope"
+ ],
+ "sydney_opera_house": [
+  "electronic_computer"
+ ],
+ "bim": [
+  "computer_aided_design"
+ ],
+ "akashi_kaikyo_bridge": [
+  "wire_rope",
+  "wind_tunnel"
+ ],
+ "construction_3d_printing": [
+  "3d_printing"
+ ]
+}

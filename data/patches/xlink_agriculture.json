@@ -1,0 +1,63 @@
+{
+ "quern": [
+  "ground_stone"
+ ],
+ "sickle": [
+  "hafting"
+ ],
+ "terracing": [
+  "dry_stone"
+ ],
+ "qanat": [
+  "surveying"
+ ],
+ "polder": [
+  "levee"
+ ],
+ "artificial_insemination": [
+  "microscope"
+ ],
+ "superphosphate": [
+  "lead_chamber_process"
+ ],
+ "haber_process": [
+  "catalysis"
+ ],
+ "drip_irrigation": [
+  "polyethylene"
+ ],
+ "agricultural_drone": [
+  "uav"
+ ],
+ "precision_agriculture": [
+  "gps"
+ ],
+ "vertical_farming": [
+  "light_emitting_diode"
+ ],
+ "radioactive_tracer": [
+  "radioactivity",
+  "isotope"
+ ],
+ "meselson_stahl": [
+  "isotope"
+ ],
+ "patch_clamp": [
+  "amplifier"
+ ],
+ "protein_nmr": [
+  "nmr_spectroscopy"
+ ],
+ "bioprinting": [
+  "3d_printing"
+ ],
+ "fish": [
+  "fluorescence_microscope"
+ ],
+ "immunofluorescence": [
+  "fluorescence_microscope"
+ ],
+ "dna_sequencing": [
+  "radioactive_tracer"
+ ]
+}

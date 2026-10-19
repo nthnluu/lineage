@@ -1,0 +1,96 @@
+{
+ "clinical_thermometer": [
+  "thermometer"
+ ],
+ "penicillin": [
+  "microbiological_culture"
+ ],
+ "medical_ultrasound": [
+  "sonar"
+ ],
+ "gamma_camera": [
+  "scintillation_counter",
+  "photomultiplier"
+ ],
+ "fiberscope": [
+  "optical_fiber"
+ ],
+ "mri": [
+  "nmr_spectroscopy",
+  "superconducting_magnet"
+ ],
+ "glucose_meter": [
+  "biosensor"
+ ],
+ "gene_therapy": [
+  "viral_vector"
+ ],
+ "car_t": [
+  "viral_vector"
+ ],
+ "viral_vector_vaccine": [
+  "viral_vector"
+ ],
+ "voretigene": [
+  "viral_vector"
+ ],
+ "exa_cel": [
+  "crispr_cas9"
+ ],
+ "xenotransplantation": [
+  "crispr_cas9"
+ ],
+ "ai_healthcare": [
+  "deep_learning"
+ ],
+ "clear_aligners": [
+  "3d_printing",
+  "computer_aided_design"
+ ],
+ "dental_implant": [
+  "titanium_alloy"
+ ],
+ "hip_replacement": [
+  "polyethylene"
+ ],
+ "coronary_stent": [
+  "stainless_steel"
+ ],
+ "patisiran": [
+  "sirna"
+ ],
+ "phage_therapy": [
+  "bacteriophage"
+ ],
+ "hand_cannon": [
+  "gunpowder"
+ ],
+ "cannon": [
+  "gunpowder"
+ ],
+ "ballistic_missile": [
+  "turbopump"
+ ],
+ "anti_ballistic_missile": [
+  "electronic_computer"
+ ],
+ "bulletproof_vest": [
+  "kevlar"
+ ],
+ "loitering_munition": [
+  "uav"
+ ],
+ "ucav": [
+  "gps",
+  "uav"
+ ],
+ "stuxnet": [
+  "computer_worm"
+ ],
+ "dreadnought": [
+  "steam_turbine"
+ ],
+ "tank": [
+  "tractor"
+ ]
+}

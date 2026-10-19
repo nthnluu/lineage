@@ -1,0 +1,815 @@
+
+<title>Lineage</title>
+<meta name="description" content="Lineage is a browsable technology tree: thousands of inventions from stone tools to today, linked by what each one required, with every entry linked to Wikipedia.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2026%2026%22%3E%3Cstyle%3Epath%7Bstroke%3A%231d1c1a%7Dcircle%7Bfill%3A%231d1c1a%7D%40media%20%28prefers-color-scheme%3Adark%29%7Bpath%7Bstroke%3A%23ecebe8%7Dcircle%7Bfill%3A%23ecebe8%7D%7D%3C/style%3E%3Cpath%20d%3D%22M8%203v20M8%208c0%203%203%204%207%204M8%2015c0%203%204%204%2010%204%22%20fill%3D%22none%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22/%3E%3Ccircle%20cx%3D%228%22%20cy%3D%223%22%20r%3D%222.6%22/%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2212%22%20r%3D%222.6%22/%3E%3Ccircle%20cx%3D%2219%22%20cy%3D%2219%22%20r%3D%222.6%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: app shell. 56px toolbar; Explore = path bar + Miller columns + inspector; Index = filter bar + virtualized register. Monochrome UI, category hue is the only color. */
+:root {
+  --bg: #ffffff;
+  --bg-2: #fafafa;
+  --bg-3: #f2f2f3;
+  --line: #ebebeb;
+  --line-2: #dcdcde;
+  --fg: #0a0a0a;
+  --fg-2: #5b5b61;
+  --fg-3: #9b9ba1;
+  --link: #0060df;
+  --sel: #0a0a0a;
+  --sel-fg: #ffffff;
+  --scrim: rgb(0 0 0 / .28);
+  --shadow-pop: 0 0 0 1px rgb(0 0 0 / .06), 0 16px 48px -8px rgb(0 0 0 / .22);
+  --shadow-1: 0 1px 2px rgb(0 0 0 / .05);
+  --cat-l: .62; --cat-c: .17;
+  --sans: "Geist", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --col-w: 284px;
+  --insp-w: 440px;
+  --pad-l: max(16px, env(safe-area-inset-left, 0px));
+  --pad-r: max(16px, env(safe-area-inset-right, 0px));
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0a0a0a; --bg-2: #111112; --bg-3: #1b1b1d; --line: #222224; --line-2: #333336;
+    --fg: #ededed; --fg-2: #a1a1a6; --fg-3: #6e6e74; --link: #52a8ff; --sel: #ededed; --sel-fg: #0a0a0a;
+    --scrim: rgb(0 0 0 / .6); --shadow-pop: 0 0 0 1px rgb(255 255 255 / .08), 0 16px 48px -8px rgb(0 0 0 / .7); --shadow-1: none;
+    --cat-l: .72; --cat-c: .16; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0a0a0a; --bg-2: #111112; --bg-3: #1b1b1d; --line: #222224; --line-2: #333336;
+  --fg: #ededed; --fg-2: #a1a1a6; --fg-3: #6e6e74; --link: #52a8ff; --sel: #ededed; --sel-fg: #0a0a0a;
+  --scrim: rgb(0 0 0 / .6); --shadow-pop: 0 0 0 1px rgb(255 255 255 / .08), 0 16px 48px -8px rgb(0 0 0 / .7); --shadow-1: none;
+  --cat-l: .72; --cat-c: .16; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.45 var(--sans);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+:focus-visible { outline: 2px solid var(--link); outline-offset: 1px; border-radius: 6px; }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: oklch(var(--cat-l) var(--cat-c) var(--h)); }
+.kbd { font: 500 11px/1 var(--mono); color: var(--fg-3); border: 1px solid var(--line-2); border-radius: 5px; padding: 3px 5px; background: var(--bg); }
+.icon { width: 16px; height: 16px; flex: none; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 10px; border: 3px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ---------- toolbar ---------- */
+.bar {
+  flex: none; height: 56px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px;
+  padding-left: var(--pad-l); padding-right: var(--pad-r); border-bottom: 1px solid var(--line); background: var(--bg);
+}
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; border: 0; background: none; padding: 0; text-align: left; }
+.brand svg { flex: none; }
+.brand b { font-weight: 600; font-size: 15px; letter-spacing: -.015em; white-space: nowrap; }
+.brand span { color: var(--fg-3); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seg { display: inline-flex; padding: 3px; gap: 2px; border-radius: 9px; background: var(--bg-3); }
+.seg button { border: 0; background: none; padding: 5px 14px; border-radius: 7px; font-weight: 500; font-size: 13px; color: var(--fg-2); transition: color .15s, background .15s; }
+.seg button[aria-selected="true"] { background: var(--bg); color: var(--fg); box-shadow: var(--shadow-1), 0 0 0 1px var(--line); }
+.bar-r { display: flex; justify-content: flex-end; gap: 8px; min-width: 0; }
+.search-btn {
+  display: flex; align-items: center; gap: 8px; width: min(300px, 100%); height: 34px; padding: 0 6px 0 10px;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--bg-2); color: var(--fg-3); text-align: left; transition: border-color .15s;
+}
+.search-btn:hover { border-color: var(--line-2); }
+.search-btn .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.ibtn { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--fg-2); flex: none; }
+.ibtn:hover { color: var(--fg); border-color: var(--line-2); }
+
+main { flex: 1; min-height: 0; display: flex; }
+.view { flex: 1; min-width: 0; display: flex; }
+
+/* ---------- explore ---------- */
+.browser { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--bg-2); }
+.pathbar {
+  flex: none; height: 40px; display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none;
+  padding-left: var(--pad-l); padding-right: var(--pad-r); border-bottom: 1px solid var(--line); background: var(--bg); font-size: 13px; white-space: nowrap;
+}
+.pathbar::-webkit-scrollbar { display: none; }
+.pathbar button { border: 0; background: none; padding: 4px 6px; border-radius: 6px; color: var(--fg-2); }
+.pathbar button:hover { background: var(--bg-3); color: var(--fg); }
+.pathbar button:last-child { color: var(--fg); font-weight: 500; }
+.pathbar .sep { color: var(--fg-3); }
+.cols { flex: 1; min-height: 0; display: flex; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; }
+.col { flex: none; width: var(--col-w); display: flex; flex-direction: column; border-right: 1px solid var(--line); min-height: 0; background: var(--bg); }
+.col.enter { animation: colIn .22s var(--ease); }
+@keyframes colIn { from { transform: translateX(-10px); opacity: .4; } }
+.col-h { flex: none; padding: 12px 14px 8px; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.col-h .l { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .06em; color: var(--fg-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.col-h .c { font: 500 11px var(--mono); color: var(--fg-3); }
+.col-list { flex: 1; overflow-y: auto; padding: 0 6px 12px; overscroll-behavior: contain; }
+.it {
+  display: flex; align-items: center; gap: 10px; width: 100%; height: 34px; padding: 0 8px 0 10px; border: 0; border-radius: 7px;
+  background: none; text-align: left; color: var(--fg); transition: background .08s;
+}
+.it:hover { background: var(--bg-3); }
+.it .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.it .yr { font: 12px var(--mono); color: var(--fg-3); font-variant-numeric: tabular-nums; }
+.it .chev { width: 12px; color: var(--fg-3); flex: none; opacity: 0; }
+.it.has .chev { opacity: 1; }
+.it.path { background: var(--bg-3); font-weight: 500; }
+.it.sel { background: var(--sel); color: var(--sel-fg); font-weight: 500; }
+.it.sel .yr, .it.sel .chev { color: var(--sel-fg); opacity: .7; }
+.it:focus-visible { outline-offset: -2px; }
+.grp { padding: 14px 10px 4px; font-size: 11px; font-weight: 500; color: var(--fg-3); letter-spacing: .02em; }
+.col-empty { padding: 10px 14px; color: var(--fg-3); font-size: 13px; }
+.col-pad { flex: 1; min-width: 40px; }
+
+/* ---------- inspector ---------- */
+.insp { flex: none; width: var(--insp-w); border-left: 1px solid var(--line); background: var(--bg); overflow-y: auto; overscroll-behavior: contain; }
+.card { padding: 28px 28px 56px; display: flex; flex-direction: column; gap: 22px; }
+.card.fade { animation: fade .2s var(--ease); }
+@keyframes fade { from { opacity: .3; transform: translateY(3px); } }
+.pill { display: inline-flex; align-items: center; gap: 7px; height: 24px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--line); font-size: 12px; color: var(--fg-2); font-weight: 500; background: var(--bg); }
+.pill.btn:hover { border-color: var(--line-2); color: var(--fg); }
+.meta-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.card h1 { margin: 12px 0 0; font-size: 32px; line-height: 1.1; font-weight: 600; letter-spacing: -.028em; text-wrap: balance; }
+.card .when { margin-top: 8px; font: 500 14px var(--mono); color: var(--fg-2); font-variant-numeric: tabular-nums; }
+.card .lede { margin: 0; font-size: 15.5px; line-height: 1.6; color: var(--fg-2); max-width: 60ch; text-wrap: pretty; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-p, .btn-s { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: 8px; font-weight: 500; font-size: 13.5px; text-decoration: none !important; border: 1px solid transparent; }
+.btn-p { background: var(--sel); color: var(--sel-fg); }
+.btn-p:hover { opacity: .88; }
+.btn-s { background: var(--bg); color: var(--fg); border-color: var(--line); }
+.btn-s:hover { border-color: var(--line-2); background: var(--bg-2); }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--line); border-radius: 12px; }
+.stats > div { padding: 12px 14px; }
+.stats > div + div { border-left: 1px solid var(--line); }
+.stats b { display: block; font: 500 20px var(--mono); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.stats span { font-size: 12px; color: var(--fg-3); }
+.sec { display: flex; flex-direction: column; gap: 10px; }
+.sec-h { display: flex; align-items: baseline; justify-content: space-between; font-size: 12px; font-weight: 500; color: var(--fg-3); text-transform: uppercase; letter-spacing: .06em; }
+.sec-h .c { font: 500 11px var(--mono); text-transform: none; letter-spacing: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 7px; height: 28px; max-width: 100%; padding: 0 10px 0 9px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--bg); font-size: 13px; transition: border-color .12s, background .12s;
+}
+.chip:hover { border-color: var(--line-2); background: var(--bg-2); }
+.chip .cn { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip .cy { font: 11.5px var(--mono); color: var(--fg-3); }
+.more { border: 0; background: none; color: var(--link); padding: 0 6px; height: 28px; font-size: 13px; }
+.muted { color: var(--fg-3); font-size: 13px; }
+.rows { display: none; flex-direction: column; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.rows button { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 8px 14px; border: 0; background: var(--bg); text-align: left; }
+.rows button + button { border-top: 1px solid var(--line); }
+.rows button:active { background: var(--bg-3); }
+.rows .nm { flex: 1; min-width: 0; font-size: 15px; }
+.rows .yr { font: 12.5px var(--mono); color: var(--fg-3); }
+.rows .sub { display: block; font-size: 12px; color: var(--fg-3); }
+
+/* time ribbon + lineage */
+.ribbon { position: relative; height: 44px; margin-top: 2px; }
+.ribbon .band { position: absolute; top: 0; height: 20px; border-radius: 3px; background: var(--bg-3); }
+.ribbon .band:nth-child(even) { background: var(--bg-2); }
+.ribbon .mk { position: absolute; top: -2px; width: 2px; height: 24px; margin-left: -1px; border-radius: 2px; background: var(--fg-3); opacity: .55; }
+.ribbon .mk.now { background: var(--fg); opacity: 1; width: 3px; margin-left: -1.5px; }
+.ribbon .tk { position: absolute; top: 26px; font: 10.5px var(--mono); color: var(--fg-3); transform: translateX(-50%); white-space: nowrap; }
+.lin { list-style: none; margin: 0; padding: 0; }
+.lin li { display: grid; grid-template-columns: 78px 20px 1fr; align-items: center; min-height: 30px; }
+.lin .y { font: 12px var(--mono); color: var(--fg-3); text-align: right; padding-right: 4px; font-variant-numeric: tabular-nums; }
+.lin .r { position: relative; align-self: stretch; display: grid; place-items: center; }
+.lin .r::before { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: var(--line-2); }
+.lin li:first-child .r::before { top: 50%; }
+.lin li:last-child .r::before { bottom: 50%; }
+.lin .r .dot { position: relative; box-shadow: 0 0 0 3px var(--bg); }
+.lin button { border: 0; background: none; padding: 4px 6px; text-align: left; border-radius: 6px; font-size: 13.5px; color: var(--fg); justify-self: start; }
+.lin button:hover { background: var(--bg-3); }
+.lin li.here button { font-weight: 600; }
+
+/* welcome */
+.hello { padding: 36px 28px 56px; display: flex; flex-direction: column; gap: 26px; }
+.hello h1 { margin: 0; font-size: 34px; line-height: 1.08; font-weight: 600; letter-spacing: -.032em; text-wrap: balance; }
+.hello p { margin: 0; color: var(--fg-2); font-size: 15.5px; line-height: 1.6; text-wrap: pretty; }
+.kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.kpis div { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.kpis b { display: block; font: 500 22px var(--mono); letter-spacing: -.03em; }
+.kpis span { font-size: 12px; color: var(--fg-3); }
+.cats { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 12px; }
+.cats button { display: flex; align-items: center; gap: 9px; border: 0; background: none; padding: 6px 8px; border-radius: 7px; text-align: left; font-size: 13px; }
+.cats button:hover { background: var(--bg-3); }
+.cats .n { margin-left: auto; font: 11.5px var(--mono); color: var(--fg-3); }
+
+/* ---------- index ---------- */
+.reg { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.tools { flex: none; display: flex; flex-direction: column; gap: 10px; padding: 12px var(--pad-r) 12px var(--pad-l); border-bottom: 1px solid var(--line); }
+.tools-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.field { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--fg-3); }
+.field:focus-within { border-color: var(--line-2); box-shadow: 0 0 0 3px var(--bg-3); }
+.field input { border: 0; outline: 0; background: none; width: 220px; color: var(--fg); font-size: 13px; }
+.field input::placeholder { color: var(--fg-3); }
+.sel-wrap { position: relative; }
+.sel-wrap select { appearance: none; height: 32px; padding: 0 28px 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); font-size: 13px; color: var(--fg); }
+.sel-wrap svg { position: absolute; right: 9px; top: 50%; translate: 0 -50%; pointer-events: none; color: var(--fg-3); }
+.count { margin-left: auto; font: 12px var(--mono); color: var(--fg-3); }
+.catbar { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin-left: calc(-1 * var(--pad-l)); margin-right: calc(-1 * var(--pad-r)); padding-left: var(--pad-l); padding-right: var(--pad-r); }
+.catbar::-webkit-scrollbar { display: none; }
+.ct { display: inline-flex; align-items: center; gap: 7px; flex: none; height: 28px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); font-size: 12.5px; color: var(--fg-2); transition: all .12s; }
+.ct:hover { border-color: var(--line-2); }
+.ct .n { font: 11px var(--mono); color: var(--fg-3); }
+.ct[aria-pressed="true"] { background: var(--sel); color: var(--sel-fg); border-color: var(--sel); }
+.ct[aria-pressed="true"] .n { color: var(--sel-fg); opacity: .7; }
+.thead, .vrow { display: grid; grid-template-columns: 112px minmax(180px, 1.1fr) 190px minmax(0, 2fr) 72px 32px; gap: 16px; align-items: center; padding-left: var(--pad-l); padding-right: var(--pad-r); }
+.thead { flex: none; height: 34px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .06em; color: var(--fg-3); border-bottom: 1px solid var(--line); background: var(--bg-2); }
+.thead .r, .vrow .r { text-align: right; }
+.vlist { flex: 1; overflow-y: auto; position: relative; overscroll-behavior: contain; contain: strict; }
+.vspace { position: relative; width: 100%; }
+.vrow { position: absolute; left: 0; right: 0; height: 44px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.vrow:hover { background: var(--bg-2); }
+.vrow .y { font: 12.5px var(--mono); color: var(--fg-3); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.vrow .n { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vrow .f { display: flex; align-items: center; gap: 8px; color: var(--fg-2); font-size: 13px; overflow: hidden; white-space: nowrap; }
+.vrow .d { color: var(--fg-2); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vrow .l { font: 12.5px var(--mono); color: var(--fg-3); text-align: right; }
+.vrow .w { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 6px; color: var(--fg-3); }
+.vrow .w:hover { background: var(--bg-3); color: var(--fg); text-decoration: none; }
+.vgrp { position: absolute; left: 0; right: 0; height: 40px; display: flex; align-items: flex-end; gap: 10px; padding: 0 var(--pad-r) 8px var(--pad-l); border-bottom: 1px solid var(--line); background: var(--bg); font-size: 12px; font-weight: 600; color: var(--fg); }
+.vgrp span { font: 11.5px var(--mono); color: var(--fg-3); font-weight: 400; }
+.vempty { padding: 40px var(--pad-r) 40px var(--pad-l); color: var(--fg-3); }
+
+/* ---------- palette ---------- */
+.scrim { position: fixed; inset: 0; z-index: 50; background: var(--scrim); display: flex; justify-content: center; align-items: flex-start; padding: max(10vh, env(safe-area-inset-top, 0px)) var(--pad-r) 16px var(--pad-l); animation: scrimIn .14s ease-out; }
+@keyframes scrimIn { from { opacity: 0; } }
+.pal { width: min(640px, 100%); max-height: min(560px, 76vh); display: flex; flex-direction: column; border-radius: 14px; background: var(--bg); box-shadow: var(--shadow-pop); overflow: hidden; animation: palIn .18s var(--ease); }
+@keyframes palIn { from { transform: scale(.98) translateY(-4px); opacity: 0; } }
+.pal-in { display: flex; align-items: center; gap: 10px; padding: 0 16px; height: 54px; border-bottom: 1px solid var(--line); color: var(--fg-3); }
+.pal-in input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; font-size: 16px; color: var(--fg); }
+.pal-in input::placeholder { color: var(--fg-3); }
+.pal-list { flex: 1; overflow-y: auto; padding: 6px; }
+.pal-h { padding: 8px 10px 4px; font-size: 11.5px; font-weight: 500; color: var(--fg-3); }
+.pal-it { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 42px; padding: 6px 10px; border: 0; border-radius: 8px; background: none; text-align: left; }
+.pal-it[aria-selected="true"] { background: var(--bg-3); }
+.pal-it .tx { flex: 1; min-width: 0; }
+.pal-it .nm { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pal-it .sub { display: block; font-size: 12px; color: var(--fg-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pal-it .yr { font: 12px var(--mono); color: var(--fg-3); }
+.pal-it mark { background: none; color: inherit; font-weight: 600; }
+.pal-f { flex: none; display: flex; gap: 14px; padding: 8px 14px; border-top: 1px solid var(--line); font-size: 12px; color: var(--fg-3); background: var(--bg-2); }
+.pal-f span { display: inline-flex; gap: 6px; align-items: center; }
+.pal-empty { padding: 28px 16px; text-align: center; color: var(--fg-3); }
+
+.desk-only { }
+.mob-only { display: none !important; }
+
+@media (max-width: 1180px) { :root { --insp-w: 380px; --col-w: 252px; } }
+@media (max-width: 980px) {
+  .thead, .vrow { grid-template-columns: 100px minmax(160px, 1fr) 170px 64px 32px; }
+  .thead .d, .vrow .d { display: none; }
+}
+@media (max-width: 760px) {
+  .bar { grid-template-columns: 1fr auto; height: 52px; }
+  .bar .seg-wrap { grid-column: 1 / -1; grid-row: 2; }
+  .brand span { display: none; }
+  .search-btn { width: 34px; padding: 0; justify-content: center; }
+  .search-btn .t, .search-btn .kbd { display: none; }
+  .desk-only { display: none !important; }
+  .mob-only { display: flex !important; }
+  .cols { display: none; }
+  .browser { flex: none; }
+  #explore { flex-direction: column; }
+  .insp { width: auto; flex: 1; border-left: 0; }
+  .pathbar { display: flex; }
+  .card { padding: 20px var(--pad-r) 48px var(--pad-l); gap: 20px; }
+  .hello { padding: 24px var(--pad-r) 48px var(--pad-l); }
+  .card h1 { font-size: 28px; }
+  .hello h1 { font-size: 28px; }
+  .rows { display: flex; }
+  .chips.kids { display: none; }
+  .tools .field { flex: 1; }
+  .field input { width: 100%; }
+  .thead { display: none; }
+  .vrow { grid-template-columns: 1fr auto; grid-template-rows: auto auto; row-gap: 2px; height: 60px; align-content: center; }
+  .vrow .y { grid-column: 2; grid-row: 1; }
+  .vrow .n { grid-column: 1; grid-row: 1; }
+  .vrow .f { grid-column: 1 / -1; grid-row: 2; font-size: 12px; }
+  .vrow .l, .vrow .w, .vrow .d { display: none; }
+  .scrim { padding-top: max(12px, env(safe-area-inset-top, 0px)); }
+  .pal { max-height: 80vh; }
+  .pal-f { display: none; }
+  .kpis b { font-size: 18px; }
+}
+.mob-bar { display: none; }
+@media (max-width: 760px) {
+  .mob-bar { display: flex; flex: none; align-items: center; justify-content: center; padding: 0 var(--pad-r) 10px var(--pad-l); border-bottom: 1px solid var(--line); }
+  .mob-bar .seg { width: 100%; }
+  .mob-bar .seg button { flex: 1; }
+  .bar .seg { display: none; }
+  .bar { border-bottom: 0; }
+}
+/*GRAPHCSS*/
+/*FLOATCSS*/
+/*DESKCSS*/
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+
+<header class="bar">
+  <button class="brand" id="home" aria-label="Lineage, go to start">
+    <svg width="24" height="24" viewBox="0 0 26 26" fill="none" aria-hidden="true"><path d="M8 3v20M8 8c0 3 3 4 7 4M8 15c0 3 4 4 10 4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><circle cx="8" cy="3" r="2.1" fill="currentColor"/><circle cx="16" cy="12" r="2.1" fill="currentColor"/><circle cx="19" cy="19" r="2.1" fill="currentColor"/></svg>
+    <b>Lineage</b><span id="tagline">the technology tree</span>
+  </button>
+  <div class="bar-r">
+    <div class="seg" role="tablist" aria-label="View">
+    <button role="tab" data-tab="explore" aria-selected="true">Explore</button>
+    <button role="tab" data-tab="graph" aria-selected="false">Graph</button>
+  <button role="tab" data-tab="index" aria-selected="false">Index</button>
+    </div>
+    <button class="ibtn desk-only" id="random" title="Random technology (R)" aria-label="Random technology">
+      <svg class="icon" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 4.5h2.2c1.4 0 2.2.7 3 1.8l1.6 2.4c.8 1.1 1.6 1.8 3 1.8H14M2 11.5h2.2c1.4 0 2.2-.7 3-1.8M9.8 6.3c.8-1.1 1.6-1.8 3-1.8H14m-1.6-1.8L14 4.5l-1.6 1.6m0 3.8L14 11.5l-1.6 1.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+</header>
+<div class="mob-bar"><div class="seg" role="tablist" aria-label="View">
+  <button role="tab" data-tab="explore" aria-selected="true">Explore</button>
+  <button role="tab" data-tab="graph" aria-selected="false">Graph</button>
+  <button role="tab" data-tab="index" aria-selected="false">Index</button>
+</div></div>
+
+<main>
+  <section class="view" id="explore">
+    <div class="browser">
+      <nav class="pathbar" id="pathbar" aria-label="Path"></nav>
+      <div class="cols" id="cols" aria-label="Technology columns"></div>
+    </div>
+    <aside class="insp" id="insp" aria-live="polite"></aside>
+  </section>
+
+<!--GRAPHHTML-->  <section class="view" id="index" hidden>
+    <div class="reg">
+      <div class="tools">
+        <div class="tools-row">
+          <label class="field" for="f-text">
+            <svg class="icon" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 4h11M4.5 8h7M6.5 12h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <input id="f-text" type="search" placeholder="Filter by name or description" autocomplete="off">
+          </label>
+          <div class="sel-wrap"><select id="f-era" aria-label="Era"></select><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5l3-3" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg></div>
+          <div class="sel-wrap"><select id="f-sort" aria-label="Sort">
+            <option value="year">Oldest first</option>
+            <option value="-year">Newest first</option>
+            <option value="name">Name A–Z</option>
+            <option value="-des">Most built upon</option>
+          </select><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5l3-3" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg></div>
+          <span class="count" id="f-count"></span>
+        </div>
+        <div class="catbar" id="catbar"></div>
+      </div>
+      <div class="thead" aria-hidden="true"><span class="r">Year</span><span>Technology</span><span>Field</span><span class="d">Description</span><span class="r" title="Technologies that build on it, directly or indirectly">Leads to</span><span></span></div>
+      <div class="vlist" id="vlist"><div class="vspace" id="vspace"></div></div>
+    </div>
+  </section>
+</main>
+<div class="composer-wrap"><button class="composer" id="open-search" aria-label="Search technologies">
+  <svg class="icon" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.75" stroke="currentColor" stroke-width="1.5"/><path d="m10.5 10.5 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  <span class="t" id="search-ph">Search</span><span class="kbd" id="kbd-hint">⌘K</span>
+</button></div>
+
+<script>
+"use strict";
+const RAW = /*DATA*/[];
+
+const CATS = {
+  foundations:  ["Prehistoric foundations", 55],
+  knowledge:    ["Science & mathematics", 290],
+  agriculture:  ["Agriculture & food", 135],
+  materials:    ["Materials & chemistry", 70],
+  construction: ["Construction", 85],
+  manufacturing:["Tools & manufacturing", 40],
+  energy:       ["Energy & power", 100],
+  electronics:  ["Electronics", 205],
+  computing:    ["Computing", 255],
+  communication:["Communication & media", 320],
+  transport:    ["Transport", 160],
+  aerospace:    ["Aerospace", 230],
+  medicine:     ["Medicine", 15],
+  biotech:      ["Life sciences", 150],
+  instruments:  ["Instruments & measurement", 185],
+  military:     ["Warfare", 0],
+  daily:        ["Everyday life", 115],
+};
+const ERAS = [
+  ["prehistory", "Prehistory", -Infinity, -3200],
+  ["ancient", "Ancient world", -3200, 500],
+  ["medieval", "Middle Ages", 500, 1450],
+  ["earlymodern", "Early modern", 1450, 1760],
+  ["industrial", "Industrial age", 1760, 1900],
+  ["early20", "Early 20th century", 1900, 1945],
+  ["postwar", "Atomic and space age", 1945, 1990],
+  ["digital", "Information age", 1990, Infinity],
+];
+const eraIdx = y => { for (let i = 0; i < ERAS.length; i++) if (y < ERAS[i][3]) return i; return ERAS.length - 1; };
+
+/* ---------- model ---------- */
+const N = RAW.map((r, i) => ({ i, id: r[0], name: r[1], year: r[2], cat: r[3], wiki: r[4], req: r[5], desc: r[6], kids: [] }));
+const byId = new Map(N.map(n => [n.id, n]));
+for (const n of N) { n.req = n.req.map(id => byId.get(id)).filter(Boolean); for (const p of n.req) p.kids.push(n); n.era = eraIdx(n.year); }
+const byYear = (a, b) => a.year - b.year || (a.name < b.name ? -1 : 1);
+for (const n of N) { n.kids.sort(byYear); n.req.sort(byYear); }
+const topo = [];
+{ const deg = N.map(n => n.req.length), q = N.filter(n => !n.req.length); for (let h = 0; h < q.length; h++) { const n = q[h]; topo.push(n); for (const k of n.kids) if (--deg[k.i] === 0) q.push(k); } }
+for (const n of topo) { n.depth = 0; n.best = null; for (const p of n.req) if (p.depth + 1 > n.depth || (p.depth + 1 === n.depth && p.year > n.best.year)) { n.depth = p.depth + 1; n.best = p; } }
+{
+  const W = (N.length + 31) >> 5;
+  const pop = a => { let c = 0; for (let x of a) { x -= (x >>> 1) & 0x55555555; x = (x & 0x33333333) + ((x >>> 2) & 0x33333333); c += (((x + (x >>> 4)) & 0x0f0f0f0f) * 0x01010101) >>> 24; } return c; };
+  const buf = new Uint32Array(W * N.length), row = i => buf.subarray(i * W, i * W + W);
+  for (const n of topo) { const a = row(n.i); for (const p of n.req) { const pa = row(p.i); for (let w = 0; w < W; w++) a[w] |= pa[w]; a[p.i >> 5] |= 1 << (p.i & 31); } }
+  for (const n of N) n.nAnc = pop(row(n.i));
+  buf.fill(0);
+  for (let t = topo.length - 1; t >= 0; t--) { const n = topo[t], d = row(n.i); for (const k of n.kids) { const kd = row(k.i); for (let w = 0; w < W; w++) d[w] |= kd[w]; d[k.i >> 5] |= 1 << (k.i & 31); } }
+  for (const n of N) n.nDes = pop(row(n.i));
+}
+const roots = N.filter(n => !n.req.length).sort(byYear);
+const lineage = n => { const out = []; for (let x = n; x; x = x.best) out.unshift(x); return out; };
+const EDGES = N.reduce((s, n) => s + n.req.length, 0);
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const fmt = x => x.toLocaleString("en-US");
+function fmtYear(y) {
+  if (y <= -1000000) return `c. ${+(-y / 1e6).toFixed(1)} million BCE`;
+  if (y < -10000) return `c. ${fmt(Math.round(-y / 1000) * 1000)} BCE`;
+  if (y < -500) return `c. ${fmt(-y)} BCE`;
+  if (y < 0) return `${-y} BCE`;
+  if (y < 1000) return `${y} CE`;
+  return String(y);
+}
+function yr(y) {
+  if (y <= -1000000) return `${+(-y / 1e6).toFixed(1)}M BCE`;
+  if (y <= -10000) return `${Math.round(-y / 1000)}k BCE`;
+  if (y < 0) return `${-y} BCE`;
+  if (y < 1000) return `${y} CE`;
+  return String(y);
+}
+const wikiUrl = t => "https://en.wikipedia.org/wiki/" + encodeURIComponent(t.replace(/ /g, "_")).replace(/%2F/g, "/").replace(/%3A/g, ":").replace(/%2C/g, ",").replace(/%28/g, "(").replace(/%29/g, ")");
+const H = n => CATS[n.cat][1];
+const dot = n => `<span class="dot" style="--h:${H(n)}"></span>`;
+const ICON_EXT = `<svg class="icon" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3H3.5v9.5H13V10M9 3h4v4M13 3 7.5 8.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const CHEV = `<svg class="chev" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="m4.5 2.5 3.5 3.5-3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+
+$("#search-ph").textContent = matchMedia("(hover: hover) and (pointer: fine)").matches ? `Search ${fmt(N.length)} technologies, or press /` : `Search ${fmt(N.length)} technologies`;
+$("#kbd-hint").textContent = isMac ? "⌘K" : "Ctrl K";
+
+/* ---------- explore ---------- */
+let path = [];
+const listFor = k => k === 0 ? roots : path[k - 1].kids;
+
+function go(n, opt = {}) {
+  if (!n) path = [];
+  else if (opt.col != null) { path = path.slice(0, opt.col); path.push(n); }
+  else if (path.includes(n)) path = path.slice(0, path.indexOf(n) + 1);
+  else if (path.length && path[path.length - 1].kids.includes(n)) path.push(n);
+  else path = lineage(n);
+  const cur = path[path.length - 1];
+  try { history.replaceState(null, "", cur ? "#" + cur.id : location.pathname + location.search); } catch (e) {}
+  if (cur) { recent = [cur.id, ...recent.filter(x => x !== cur.id)].slice(0, 8); store.set("tt-recent", recent.join(",")); }
+  renderCols(opt.focus);
+  renderPath();
+  renderInsp(cur);
+  if (tab === "graph") graphShow(cur);
+}
+function openNode(n) { if (tab === "index") setTab("explore"); go(n); }
+
+function colBody(list, k) {
+  const sel = path[k], on = new Set(path);
+  const group = list.length > 14;
+  let h = "", last = -1;
+  for (const n of list) {
+    if (group && n.era !== last) { h += `<div class="grp">${ERAS[n.era][1]}</div>`; last = n.era; }
+    const cls = "it" + (n.kids.length ? " has" : "") + (n === sel ? " sel" : on.has(n) ? " path" : "");
+    h += `<button class="${cls}" data-id="${n.id}" data-col="${k}" tabindex="${n === sel || (!sel && n === list[0]) ? 0 : -1}">${dot(n)}<span class="nm">${esc(n.name)}</span><span class="yr">${yr(n.year)}</span>${CHEV}</button>`;
+  }
+  return h || `<div class="col-empty">Nothing in the index builds on this yet.</div>`;
+}
+const colKeys = []; // parent id per rendered column ("" for roots)
+function renderCols(focus) {
+  const el = $("#cols");
+  const want = [""].concat(path.filter(n => n.kids.length).length === path.length ? path.map(n => n.id) : path.map(n => n.id));
+  // keep only columns for nodes with kids, plus roots
+  const keys = [""];
+  path.forEach(n => { if (n.kids.length) keys.push(n.id); });
+  let same = 0;
+  while (same < keys.length && same < colKeys.length && keys[same] === colKeys[same]) same++;
+  const cols = [...el.querySelectorAll(".col")];
+  for (let k = cols.length - 1; k >= same; k--) cols[k].remove();
+  colKeys.length = same;
+  // refresh selection state in kept columns
+  for (let k = 0; k < same; k++) {
+    const list = el.children[k].querySelector(".col-list");
+    const sel = path[k], on = new Set(path);
+    list.querySelectorAll(".it").forEach(b => {
+      const n = byId.get(b.dataset.id);
+      b.classList.toggle("sel", n === sel);
+      b.classList.toggle("path", n !== sel && on.has(n));
+      b.tabIndex = n === sel ? 0 : -1;
+    });
+  }
+  const pad = el.querySelector(".col-pad"); if (pad) pad.remove();
+  for (let k = same; k < keys.length; k++) {
+    const parent = keys[k] ? byId.get(keys[k]) : null;
+    const list = parent ? parent.kids : roots;
+    const c = document.createElement("div");
+    c.className = "col" + (k > 0 ? " enter" : "");
+    c.setAttribute("role", "group");
+    c.setAttribute("aria-label", parent ? `Led from ${parent.name}` : "Starting points");
+    c.innerHTML = `<div class="col-h"><span class="l">${parent ? "From " + esc(parent.name) : "Starting points"}</span><span class="c">${list.length}</span></div><div class="col-list">${colBody(list, k)}</div>`;
+    el.appendChild(c);
+    colKeys.push(keys[k]);
+  }
+  el.insertAdjacentHTML("beforeend", `<div class="col-pad"></div>`);
+  // scroll selected into view in each column; reveal last columns
+  el.querySelectorAll(".col").forEach((c, k) => { const s = c.querySelector(".it.sel"); if (s) { const l = c.querySelector(".col-list"); const top = s.offsetTop, bot = top + s.offsetHeight; if (top < l.scrollTop || bot > l.scrollTop + l.clientHeight) l.scrollTop = top - l.clientHeight / 3; } });
+  const lastCol = el.querySelectorAll(".col")[keys.length - 1];
+  if (lastCol) { const right = lastCol.offsetLeft + lastCol.offsetWidth; if (right > el.scrollLeft + el.clientWidth) el.scrollTo({ left: right - el.clientWidth + 1, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); }
+  if (focus) { const s = el.querySelector(`.col:nth-child(${focus.col + 1}) .it.sel`) || el.querySelector(`.col:nth-child(${focus.col + 1}) .it`); s && s.focus({ preventScroll: true }); }
+}
+function renderPath() {
+  const p = $("#pathbar");
+  if (matchMedia("(max-width: 760px)").matches) {
+    const par = path[path.length - 2];
+    p.innerHTML = !path.length ? `<button data-crumb="-1">Starting points</button>` :
+      `<button data-crumb="${path.length - 2}" style="color:var(--link);font-weight:500">‹ ${par ? esc(par.name) : "Start"}</button>` + (par ? `<span class="sep" aria-hidden="true">·</span><button data-crumb="-1" style="color:var(--fg-3);font-weight:400">Start</button>` : "");
+    p.scrollLeft = 0;
+    return;
+  }
+  p.innerHTML = `<button data-crumb="-1">Start</button>` + path.map((n, i) => `<span class="sep" aria-hidden="true">/</span><button data-crumb="${i}">${esc(n.name)}</button>`).join("");
+  p.scrollLeft = p.scrollWidth;
+}
+
+const expanded = new Set();
+function chips(list, limit, key, extra = "") {
+  const all = expanded.has(key), shown = all ? list : list.slice(0, limit);
+  let h = shown.map(n => `<button class="chip" data-id="${n.id}" title="${esc(n.name)} · ${fmtYear(n.year)}">${dot(n)}<span class="cn">${esc(n.name)}</span><span class="cy">${yr(n.year)}</span></button>`).join("");
+  if (list.length > shown.length) h += `<button class="more" data-more="${key}">+${list.length - shown.length} more</button>`;
+  return `<div class="chips ${extra}">${h}</div>`;
+}
+function rows(list, limit, key) {
+  const all = expanded.has(key), shown = all ? list : list.slice(0, limit);
+  let h = shown.map(n => `<button data-id="${n.id}">${dot(n)}<span class="nm">${esc(n.name)}<span class="sub">${n.kids.length ? `Led to ${n.kids.length}` : CATS[n.cat][0]}</span></span><span class="yr">${yr(n.year)}</span>${n.kids.length ? CHEV.replace('class="chev"', 'class="chev" style="opacity:1;width:14px"') : ""}</button>`).join("");
+  if (list.length > shown.length) h += `<button data-more="${key}" style="color:var(--link);justify-content:center">Show ${list.length - shown.length} more</button>`;
+  return `<div class="rows">${h}</div>`;
+}
+
+// log time axis: years before 2035
+const T0 = 2035, TA = Math.log10(T0 - 2026), TB = Math.log10(T0 + 3400000);
+const tp = y => (100 - (Math.log10(Math.max(T0 - y, 9)) - TA) / (TB - TA) * 100).toFixed(2);
+function ribbon(lin, n) {
+  const bands = ERAS.map(e => { const a = Math.max(+tp(Math.max(e[2], -3400000)), 0), b = Math.min(+tp(Math.min(e[3], 2026)), 100); return `<i class="band" style="left:${a}%;width:${(b - a).toFixed(2)}%" title="${e[1]}"></i>`; }).join("");
+  const ticks = [[-1000000, "1M BCE"], [-10000, "10k BCE"], [1, "1 CE"], [1800, "1800"], [2000, "2000"]].map(([y, l]) => `<span class="tk" style="left:${tp(y)}%">${l}</span>`).join("");
+  const marks = lin.map(x => `<i class="mk${x === n ? " now" : ""}" style="left:${tp(x.year)}%"></i>`).join("");
+  return `<div class="ribbon" aria-hidden="true">${bands}${marks}${ticks}</div>`;
+}
+
+function renderInsp(n) {
+  const el = $("#insp");
+  if (!n) {
+    const start = ["smartphone", "large_language_model", "penicillin", "printing_press", "integrated_circuit", "airplane", "nuclear_reactor", "crispr_cas9", "internet", "steam_engine"].map(id => byId.get(id)).filter(Boolean);
+    const big = [...N].sort((a, b) => b.nDes - a.nDes).slice(0, 10);
+    const cc = {}; for (const x of N) cc[x.cat] = (cc[x.cat] || 0) + 1;
+    el.innerHTML = `<div class="hello card fade">
+      <section class="blk intro"><h1>Every invention stands on others.</h1>
+      <p>An index of ${fmt(N.length)} technologies and the ${fmt(EDGES)} dependencies between them, from the first stone tools to the present. Start from a root and follow what each invention made possible, or search for anything to see the chain behind it. Every entry links to Wikipedia.</p></section>
+      <div class="kpis"><div><b>${fmt(N.length)}</b><span>technologies</span></div><div><b>${fmt(EDGES)}</b><span>dependencies</span></div><div><b>${Math.max(...N.map(x => x.depth))}</b><span>longest chain</span></div></div>
+      <div class="sec"><div class="sec-h">Jump to</div>${chips(start, 99, "w1")}</div>
+      <div class="sec"><div class="sec-h">Most built upon</div>${chips(big, 99, "w2")}</div>
+      <div class="sec"><div class="sec-h">Fields <span class="c">open in Index</span></div><div class="cats">${Object.entries(CATS).filter(([k]) => cc[k]).map(([k, [nm, h]]) => `<button data-cat="${k}"><span class="dot" style="--h:${h}"></span>${nm}<span class="n">${cc[k]}</span></button>`).join("")}</div></div>
+      <div class="sec mob-only" style="display:none"><div class="sec-h">Starting points <span class="c">${roots.length}</span></div>${rows(roots, 99, "roots")}</div>
+    </div>`;
+    el.scrollTop = 0;
+    return;
+  }
+  const lin = lineage(n);
+  el.innerHTML = `<article class="card fade">
+    <section class="blk intro"><div>
+      <div class="meta-row"><button class="pill btn" data-cat="${n.cat}">${dot(n)}${CATS[n.cat][0]}</button><span class="pill">${ERAS[n.era][1]}</span></div>
+      <h1>${esc(n.name)}</h1>
+      <div class="when">${fmtYear(n.year)}</div>
+    </div>
+    <p class="lede">${esc(n.desc)}</p>
+    <div class="actions">
+      <a class="btn-p" href="${wikiUrl(n.wiki)}" target="_blank" rel="noopener">${ICON_EXT}Read on Wikipedia</a>
+      <button class="btn-s" data-index="${n.id}">Show in Index</button>
+    </div></section>
+    <div class="stats">
+      <div><b>${fmt(n.nAnc)}</b><span>inventions behind it</span></div>
+      <div><b>${fmt(n.nDes)}</b><span>built on it since</span></div>
+      <div><b>${n.depth}</b><span>generations deep</span></div>
+    </div>
+    <div class="sec"><div class="sec-h">Led directly to <span class="c">${n.kids.length}</span></div>${n.kids.length ? chips(n.kids, 18, "k" + n.id, "kids") + rows(n.kids, 30, "k" + n.id) : `<div class="muted">Nothing in the index builds directly on this yet.</div>`}</div>
+    <div class="sec"><div class="sec-h">Required <span class="c">${n.req.length}</span></div>${n.req.length ? chips(n.req, 14, "r" + n.id) : `<div class="muted">A starting point. Nothing in the index comes before it.</div>`}</div>
+    ${lin.length > 1 ? `<div class="sec"><div class="sec-h">Longest chain back <span class="c">${lin.length - 1} steps</span></div>${ribbon(lin, n)}
+      <ol class="lin">${lin.map(x => `<li class="${x === n ? "here" : ""}"><span class="y">${yr(x.year)}</span><span class="r">${dot(x)}</span><button data-id="${x.id}">${esc(x.name)}</button></li>`).join("")}</ol></div>` : ""}
+  </article>`;
+  el.scrollTop = 0;
+}
+
+$("#cols").addEventListener("click", e => { const b = e.target.closest(".it"); if (b) go(byId.get(b.dataset.id), { col: +b.dataset.col, focus: { col: +b.dataset.col } }); });
+$("#insp").addEventListener("click", e => {
+  const m = e.target.closest("[data-more]"); if (m) { expanded.add(m.dataset.more); const y = $("#insp").scrollTop; renderInsp(path[path.length - 1]); $("#insp").scrollTop = y; $("#insp .card").classList.remove("fade"); return; }
+  const c = e.target.closest("[data-cat]"); if (c) { catOn.clear(); catOn.add(c.dataset.cat); syncCats(); setTab("index"); return; }
+  const ix = e.target.closest("[data-index]"); if (ix) { showInIndex(byId.get(ix.dataset.index)); return; }
+  const b = e.target.closest("[data-id]"); if (b) go(byId.get(b.dataset.id));
+});
+$("#pathbar").addEventListener("click", e => { const b = e.target.closest("[data-crumb]"); if (!b) return; const i = +b.dataset.crumb; i < 0 ? go(null) : go(path[i]); });
+$("#home").addEventListener("click", () => { setTab("explore"); go(null); });
+$("#random").addEventListener("click", () => { openNode(N[Math.floor(Math.random() * N.length)]); });
+
+// keyboard navigation of columns
+document.addEventListener("keydown", e => {
+  if ($("#explore").hidden || scrimEl || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  const k = Math.max(path.length - 1, 0);
+  if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "j" || e.key === "k") {
+    e.preventDefault();
+    const list = listFor(k), cur = path[k];
+    const i = cur ? list.indexOf(cur) : -1;
+    const nx = list[Math.min(Math.max(i + (e.key === "ArrowDown" || e.key === "j" ? 1 : -1), 0), list.length - 1)];
+    if (nx) go(nx, { col: k, focus: { col: k } });
+  } else if (e.key === "ArrowRight" || e.key === "l") {
+    const cur = path[path.length - 1];
+    if (!cur) { e.preventDefault(); go(roots[0], { col: 0, focus: { col: 0 } }); }
+    else if (cur.kids.length) { e.preventDefault(); go(cur.kids[0], { col: path.length, focus: { col: path.length } }); }
+  } else if ((e.key === "ArrowLeft" || e.key === "h") && path.length > 1) {
+    e.preventDefault(); path.pop(); go(path[path.length - 1], { col: path.length - 1, focus: { col: path.length - 1 } });
+  } else if (e.key === "Enter" && path.length) {
+    window.open(wikiUrl(path[path.length - 1].wiki), "_blank", "noopener");
+  } else if (e.key === "r") { $("#random").click(); }
+});
+
+/* ---------- search ---------- */
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+for (const n of N) { n._n = norm(n.name); n._w = norm(n.wiki); n._d = norm(n.desc); }
+function search(q, limit = 50) {
+  q = norm(q.trim()); if (!q) return [];
+  const words = q.split(/\s+/);
+  const out = [];
+  for (const n of N) {
+    let s = 0;
+    if (n._n === q || n._w === q) s = 1000;
+    else if (n._n.startsWith(q)) s = 800;
+    else if (n._n.includes(" " + q) || n._n.includes("-" + q) || n._n.includes("(" + q)) s = 600;
+    else if (n._n.includes(q)) s = 500;
+    else if (n._w.includes(q)) s = 400;
+    else if (words.length > 1 && words.every(w => n._n.includes(w))) s = 350;
+    else if (words.every(w => n._d.includes(w) || n._n.includes(w))) s = 150;
+    if (s) out.push([s + Math.min(n.nDes, 900) / 10, n]);
+  }
+  out.sort((a, b) => b[0] - a[0]);
+  return out.slice(0, limit).map(x => x[1]);
+}
+const hl = (name, q) => { const i = norm(name).indexOf(norm(q.trim())); if (!q.trim() || i < 0) return esc(name); const L = q.trim().length; return esc(name.slice(0, i)) + "<mark>" + esc(name.slice(i, i + L)) + "</mark>" + esc(name.slice(i + L)); };
+let recent = (store.get("tt-recent") || "").split(",").filter(id => byId.has(id));
+let scrimEl = null, palHits = [], palSel = 0, lastFocus = null;
+function openPalette(initial = "") {
+  if (scrimEl) return;
+  lastFocus = document.activeElement;
+  scrimEl = document.createElement("div");
+  scrimEl.className = "scrim";
+  scrimEl.innerHTML = `<div class="pal" role="dialog" aria-modal="true" aria-label="Search technologies">
+    <div class="pal-in"><svg class="icon" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.75" stroke="currentColor" stroke-width="1.5"/><path d="m10.5 10.5 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <input id="pal-q" placeholder="Search technologies, e.g. transistor, aqueduct, CRISPR" autocomplete="off" spellcheck="false" role="combobox" aria-controls="pal-list" aria-expanded="true"><span class="kbd">esc</span></div>
+    <div class="pal-list" id="pal-list" role="listbox"></div>
+    <div class="pal-f"><span><span class="kbd">↑</span><span class="kbd">↓</span>move</span><span><span class="kbd">↵</span>open</span><span><span class="kbd">${isMac ? "⌘" : "Ctrl"}</span><span class="kbd">↵</span>open on Wikipedia</span></div>
+  </div>`;
+  document.body.appendChild(scrimEl);
+  const cb = $("#open-search").getBoundingClientRect(), pal = scrimEl.querySelector(".pal");
+  if (cb.width) { scrimEl.classList.add("dock"); Object.assign(pal.style, { left: cb.left + "px", width: cb.width + "px", bottom: (innerHeight - cb.bottom) + "px" }); }
+  const docked = scrimEl.classList.contains("dock");
+  const q = scrimEl.querySelector("#pal-q");
+  q.value = initial;
+  const update = () => { palHits = q.value.trim() ? search(q.value) : (recent.length ? recent.map(id => byId.get(id)) : [...N].sort((a, b) => b.nDes - a.nDes).slice(0, 8)); palSel = 0; renderPal(q.value); };
+  q.addEventListener("input", update);
+  q.addEventListener("keydown", e => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); const up = (e.key === "ArrowUp") === docked; palSel = up ? Math.min(palSel + 1, palHits.length - 1) : Math.max(palSel - 1, 0); renderPal(q.value, true); }
+    else if (e.key === "Enter") { e.preventDefault(); const n = palHits[palSel]; if (!n) return; if (e.metaKey || e.ctrlKey) window.open(wikiUrl(n.wiki), "_blank", "noopener"); else { closePalette(); openNode(n); } }
+    else if (e.key === "Escape") { e.preventDefault(); closePalette(); }
+    else if (e.key === "Tab") e.preventDefault();
+  });
+  scrimEl.addEventListener("mousedown", e => { if (e.target === scrimEl) closePalette(); });
+  scrimEl.querySelector("#pal-list").addEventListener("click", e => { const b = e.target.closest("[data-id]"); if (b) { closePalette(); openNode(byId.get(b.dataset.id)); } });
+  scrimEl.querySelector("#pal-list").addEventListener("mousemove", e => { const b = e.target.closest("[data-i]"); if (b && +b.dataset.i !== palSel) { palSel = +b.dataset.i; renderPal(q.value, true); } });
+  update();
+  q.focus();
+}
+function renderPal(qv, moveOnly) {
+  const L = scrimEl.querySelector("#pal-list");
+  if (moveOnly) { L.querySelectorAll("[data-i]").forEach(b => b.setAttribute("aria-selected", +b.dataset.i === palSel)); const s = L.querySelector('[aria-selected="true"]'); s && s.scrollIntoView({ block: "nearest" }); return; }
+  if (!palHits.length) { L.innerHTML = `<div class="pal-empty">No technology matches “${esc(qv.trim())}”. Try a broader word.</div>`; return; }
+  const head = qv.trim() ? "" : `<div class="pal-h">${recent.length ? "Recent" : "Most built upon"}</div>`;
+  const items = palHits.map((n, i) => `<button class="pal-it" role="option" data-i="${i}" data-id="${n.id}" aria-selected="${i === palSel}">${dot(n)}<span class="tx"><span class="nm">${hl(n.name, qv)}</span><span class="sub">${CATS[n.cat][0]} · ${esc(n.desc)}</span></span><span class="yr">${yr(n.year)}</span></button>`).join("");
+  L.innerHTML = scrimEl.classList.contains("dock") ? items + head : head + items;
+}
+window.addEventListener("resize", () => { if (scrimEl && scrimEl.classList.contains("dock")) closePalette(); });
+function closePalette() { if (!scrimEl) return; scrimEl.remove(); scrimEl = null; lastFocus && lastFocus.focus && lastFocus.focus({ preventScroll: true }); }
+$("#open-search").addEventListener("click", () => openPalette());
+document.addEventListener("keydown", e => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); scrimEl ? closePalette() : openPalette(); return; }
+  if (scrimEl) return;
+  if (e.key === "/" && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); openPalette(); }
+});
+
+/* ---------- tabs ---------- */
+let tab = "explore";
+function setTab(t) {
+  tab = t;
+  document.querySelectorAll("[data-tab]").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
+  $("#explore").hidden = t !== "explore";
+  $("#index").hidden = t !== "index";
+  $("#graph").hidden = t !== "graph";
+  if (t === "index") renderIndex();
+  if (t === "graph") graphShow(path[path.length - 1]);
+  store.set("tt-tab", t);
+}
+document.querySelectorAll("[data-tab]").forEach(b => b.addEventListener("click", () => setTab(b.dataset.tab)));
+
+/* ---------- index (virtualized) ---------- */
+const catOn = new Set();
+{
+  const cc = {}; for (const n of N) cc[n.cat] = (cc[n.cat] || 0) + 1;
+  $("#catbar").innerHTML = `<button class="ct" data-all aria-pressed="true">All fields<span class="n">${fmt(N.length)}</span></button>` + Object.entries(CATS).filter(([k]) => cc[k]).map(([k, [nm, h]]) => `<button class="ct" data-c="${k}" aria-pressed="false"><span class="dot" style="--h:${h}"></span>${nm}<span class="n">${cc[k]}</span></button>`).join("");
+  $("#f-era").innerHTML = `<option value="">All eras</option>` + ERAS.map((e, i) => `<option value="${i}">${e[1]}</option>`).join("");
+}
+function syncCats() { document.querySelectorAll("#catbar [data-c]").forEach(b => b.setAttribute("aria-pressed", catOn.has(b.dataset.c))); $("#catbar [data-all]").setAttribute("aria-pressed", !catOn.size); }
+$("#catbar").addEventListener("click", e => {
+  const b = e.target.closest(".ct"); if (!b) return;
+  if (b.hasAttribute("data-all")) catOn.clear(); else { const k = b.dataset.c; catOn.has(k) ? catOn.delete(k) : catOn.add(k); }
+  syncCats(); renderIndex();
+});
+["#f-era", "#f-sort"].forEach(s => $(s).addEventListener("change", renderIndex));
+let ft; $("#f-text").addEventListener("input", () => { clearTimeout(ft); ft = setTimeout(renderIndex, 60); });
+
+let VI = [], VO = [], VH = 0;
+const RH = () => matchMedia("(max-width: 760px)").matches ? 60 : 44, GH = 40;
+function renderIndex(keepScroll) {
+  const era = $("#f-era").value, sort = $("#f-sort").value, t = norm($("#f-text").value.trim());
+  const list = N.filter(n => (!catOn.size || catOn.has(n.cat)) && (era === "" || n.era === +era) && (!t || n._n.includes(t) || n._d.includes(t) || n._w.includes(t)));
+  const cmp = { year: byYear, "-year": (a, b) => byYear(b, a), name: (a, b) => a.name.localeCompare(b.name), "-des": (a, b) => b.nDes - a.nDes || byYear(a, b) }[sort];
+  list.sort(cmp);
+  $("#f-count").textContent = `${fmt(list.length)} of ${fmt(N.length)}`;
+  const grouped = sort === "year" || sort === "-year";
+  const counts = {}; if (grouped) for (const n of list) counts[n.era] = (counts[n.era] || 0) + 1;
+  VI = []; VO = []; let y = 0, last = -1; const rh = RH();
+  for (const n of list) {
+    if (grouped && n.era !== last) { VI.push({ g: n.era }); VO.push(y); y += GH; last = n.era; }
+    VI.push(n); VO.push(y); y += rh;
+  }
+  VH = y;
+  $("#vspace").style.height = Math.max(VH, 1) + "px";
+  if (!keepScroll) $("#vlist").scrollTop = 0;
+  lastRange = "";
+  paintIndex(counts);
+}
+let lastRange = "", gcounts = {};
+function paintIndex(counts) {
+  if (counts) gcounts = counts;
+  const v = $("#vlist"), top = v.scrollTop, bot = top + v.clientHeight;
+  if (!VI.length) { $("#vspace").innerHTML = `<div class="vempty">No technologies match these filters. Clear the filter or choose another era.</div>`; return; }
+  let lo = 0, hi = VO.length - 1;
+  while (lo < hi) { const m = (lo + hi + 1) >> 1; if (VO[m] <= top) lo = m; else hi = m - 1; }
+  const start = Math.max(0, lo - 8);
+  let end = lo; while (end < VI.length && VO[end] < bot) end++;
+  end = Math.min(VI.length, end + 12);
+  const key = start + ":" + end; if (key === lastRange) return; lastRange = key;
+  const rh = RH();
+  let h = "";
+  for (let i = start; i < end; i++) {
+    const it = VI[i];
+    if (it.g != null) { h += `<div class="vgrp" style="top:${VO[i]}px">${ERAS[it.g][1]}<span>${fmt(gcounts[it.g] || 0)}</span></div>`; continue; }
+    const n = it;
+    h += `<div class="vrow" role="button" tabindex="0" data-id="${n.id}" style="top:${VO[i]}px;height:${rh}px"><span class="y">${fmtYear(n.year).replace("c. ", "")}</span><span class="n">${esc(n.name)}</span><span class="f">${dot(n)}${CATS[n.cat][0]}</span><span class="d">${esc(n.desc)}</span><span class="l">${n.nDes ? fmt(n.nDes) : "–"}</span><a class="w" href="${wikiUrl(n.wiki)}" target="_blank" rel="noopener" title="Open “${esc(n.wiki)}” on Wikipedia" aria-label="Open on Wikipedia">${ICON_EXT}</a></div>`;
+  }
+  $("#vspace").innerHTML = h;
+}
+let raf = 0; $("#vlist").addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; paintIndex(); }); }, { passive: true });
+window.addEventListener("resize", () => { if (tab === "index") renderIndex(true); });
+$("#vlist").addEventListener("click", e => { if (e.target.closest("a")) return; const r = e.target.closest(".vrow"); if (r) { setTab("explore"); go(byId.get(r.dataset.id)); } });
+$("#vlist").addEventListener("keydown", e => { if (e.key === "Enter") { const r = e.target.closest(".vrow"); if (r) { setTab("explore"); go(byId.get(r.dataset.id)); } } });
+function showInIndex(n) {
+  catOn.clear(); syncCats(); $("#f-era").value = ""; $("#f-text").value = ""; $("#f-sort").value = "year";
+  setTab("index");
+  const i = VI.indexOf(n); if (i >= 0) { $("#vlist").scrollTop = Math.max(0, VO[i] - $("#vlist").clientHeight / 3); paintIndex(); const r = $(`#vspace [data-id="${n.id}"]`); if (r) { r.style.background = "var(--bg-3)"; r.focus({ preventScroll: true }); } }
+}
+
+/*GRAPHJS*//* ---------- boot ---------- */
+{
+  const h = decodeURIComponent(location.hash.slice(1));
+  const start = byId.get(h);
+  setTab(start ? (store.get("tt-tab") === "graph" ? "graph" : "explore") : (["index", "graph"].includes(store.get("tt-tab")) ? store.get("tt-tab") : "explore"));
+  go(start || null);
+}
+window.addEventListener("hashchange", () => { const n = byId.get(location.hash.slice(1)); if (n && path[path.length - 1] !== n) openNode(n); });
+</script>
+
+

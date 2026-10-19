@@ -1,0 +1,4 @@
+{"dna_double_helix": ["avery_experiment", "hershey_chase"],
+ "recombinant_dna": ["restriction_enzyme", "dna_ligase", "plasmid", "bacterial_transformation"],
+ "dna_sequencing": ["dna_polymerase", "gel_electrophoresis"],
+ "pcr": ["dna_polymerase", "oligonucleotide_synthesis"]}

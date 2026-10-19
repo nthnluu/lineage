@@ -1,0 +1,27 @@
+  <section class="view" id="graph" hidden>
+    <div class="gwrap" id="gwrap" aria-label="Technology graph">
+      <div class="gtools">
+        <div class="seg" role="tablist" aria-label="Graph mode">
+          <button role="tab" data-gmode="hood" aria-selected="true">Neighborhood</button>
+          <button role="tab" data-gmode="atlas" aria-selected="false">Atlas</button>
+        </div>
+        <div class="gctl glass depth" id="gdepth">
+          <span class="lb">Back</span><button data-d="up,-1" aria-label="Fewer steps back">−</button><span class="v" id="gup">2</span><button data-d="up,1" aria-label="More steps back">+</button>
+          <span class="div"></span>
+          <span class="lb">Ahead</span><button data-d="down,-1" aria-label="Fewer steps ahead">−</button><span class="v" id="gdown">2</span><button data-d="down,1" aria-label="More steps ahead">+</button>
+        </div>
+        <span class="sp"></span>
+        <div class="gctl glass">
+          <button data-z="-1" aria-label="Zoom out">−</button>
+          <button data-z="0" aria-label="Fit to screen" title="Fit (F)"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button data-z="1" aria-label="Zoom in">+</button>
+        </div>
+      </div>
+      <div class="gstage" id="gstage"><svg id="gedges" aria-hidden="true"></svg><div id="gnodes"></div></div>
+      <canvas id="atlas" hidden></canvas>
+      <div class="gtip glass" id="gtip" hidden></div>
+      <div class="glegend glass" id="glegend" hidden><span><i style="background:var(--fg)"></i>Required</span><span><i style="background:var(--link)"></i>Led to</span></div>
+      <div class="gcard glass" id="gcard"></div>
+    </div>
+  </section>
+

@@ -1,0 +1,3 @@
+{"airplane": ["lilienthal_glider", "wing_warping", "aircraft_engine", "aeronautical_propeller"],
+ "liquid_rocket": ["rocket_equation", "de_laval_nozzle"],
+ "satellite": ["r7_rocket", "rocket_equation"]}

@@ -1,0 +1,159 @@
+{
+ "punched_card": [
+  "jacquard_loom"
+ ],
+ "turing_machine": [
+  "incompleteness_theorems"
+ ],
+ "switching_circuit_theory": [
+  "relay"
+ ],
+ "zuse_z3": [
+  "relay"
+ ],
+ "harvard_mark_i": [
+  "relay"
+ ],
+ "atanasoff_berry_computer": [
+  "capacitor"
+ ],
+ "simplex_algorithm": [
+  "linear_programming"
+ ],
+ "magnetic_tape_storage": [
+  "magnetic_tape"
+ ],
+ "magnetic_core_memory": [
+  "ferrite"
+ ],
+ "microprocessor": [
+  "mosfet",
+  "self_aligned_gate"
+ ],
+ "ethernet": [
+  "coaxial_cable"
+ ],
+ "cd_rom": [
+  "compact_disc"
+ ],
+ "superconducting_qc": [
+  "superconductivity"
+ ],
+ "ascii": [
+  "baudot_code"
+ ],
+ "rsa": [
+  "modular_arithmetic"
+ ],
+ "diffie_hellman": [
+  "modular_arithmetic"
+ ],
+ "bayesian_network": [
+  "bayes_theorem"
+ ],
+ "hopfield_network": [
+  "statistical_mechanics"
+ ],
+ "machine_learning": [
+  "statistics"
+ ],
+ "dijkstras_algorithm": [
+  "graph_theory"
+ ],
+ "relational_model": [
+  "set_theory"
+ ],
+ "pagerank": [
+  "graph_theory",
+  "matrix"
+ ],
+ "tide_predicting_machine": [
+  "fourier_analysis"
+ ],
+ "ball_and_disk_integrator": [
+  "calculus"
+ ],
+ "differential_analyser": [
+  "differential_equation"
+ ],
+ "hypertext": [
+  "memex"
+ ],
+ "geometry": [
+  "surveying"
+ ],
+ "earth_circumference": [
+  "gnomon"
+ ],
+ "almagest": [
+  "armillary_sphere"
+ ],
+ "book_of_optics": [
+  "camera_obscura"
+ ],
+ "pascals_law": [
+  "barometer"
+ ],
+ "metric_system": [
+  "triangulation"
+ ],
+ "maxwell_equations": [
+  "faradays_law"
+ ],
+ "periodic_table": [
+  "modern_chemistry"
+ ],
+ "control_theory": [
+  "centrifugal_governor"
+ ],
+ "electromagnetic_waves": [
+  "induction_coil"
+ ],
+ "plancks_law": [
+  "bolometer"
+ ],
+ "special_relativity": [
+  "michelson_interferometer"
+ ],
+ "bohr_model": [
+  "spectroscope"
+ ],
+ "isotope": [
+  "mass_spectrometry"
+ ],
+ "quantum_mechanics": [
+  "bohr_model",
+  "plancks_law"
+ ],
+ "nuclear_fission": [
+  "neutron"
+ ],
+ "radiocarbon_dating": [
+  "geiger_counter"
+ ],
+ "seafloor_spreading": [
+  "echo_sounding",
+  "magnetometer"
+ ],
+ "plate_tectonics": [
+  "seismometer"
+ ],
+ "higgs_boson": [
+  "lhc"
+ ],
+ "gravitational_wave_detection": [
+  "ligo"
+ ],
+ "theory_of_computation": [
+  "turing_machine"
+ ],
+ "fractal": [
+  "electronic_computer"
+ ],
+ "calculus": [
+  "analytic_geometry"
+ ],
+ "archimedes_principle": [
+  "balance_scale"
+ ]
+}
