@@ -34,7 +34,7 @@ function gcard(n) {
     return;
   }
   el.classList.remove("empty");
-  el.innerHTML = `<div class="m">${dot(n)}${CATS[n.cat][0]} · ${fmt(n.nAnc)} behind · ${fmt(n.nDes)} ahead</div>
+  el.innerHTML = `${hasImg(n) ? `<div class="gimg">${thumb(n, "gth")}</div>` : ""}<div class="m">${dot(n)}${CATS[n.cat][0]} · ${fmt(n.nAnc)} behind · ${fmt(n.nDes)} ahead</div>
     <div class="t"><h2>${esc(n.name)}</h2><span class="yr">${yr(n.year)}</span></div>
     <p>${esc(n.desc)}</p>
     <div class="a"><a class="btn-p" href="${wikiUrl(n.wiki)}" target="_blank" rel="noopener">${ICON_EXT}Wikipedia</a><button class="btn-s" data-gopen="explore">Open in Explore</button>${G.mode === "atlas" ? `<button class="btn-s" data-gopen="hood">Neighborhood</button>` : `<button class="btn-s" data-gopen="atlas">Find in Atlas</button>`}</div>`;

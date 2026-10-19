@@ -139,3 +139,37 @@ body { font-size: 14.5px; }
   .composer { height: 50px; font-size: 14.5px; }
   .composer .kbd { display: none; }
 }
+
+/* ---------- display serif + Wikipedia images ---------- */
+:root { --display: "Exposure", "Newsreader", "Iowan Old Style", Georgia, serif; }
+.card h1, .hello h1, .gcard h2 { font-family: var(--display); font-weight: 400; letter-spacing: -.022em; font-optical-sizing: auto; }
+.card h1 { font-size: 40px; line-height: 1.04; margin-top: 14px; }
+.hello h1 { font-size: 44px; line-height: 1.02; }
+.gcard h2 { font-size: 22px; }
+
+.blk.intro { overflow: hidden; }
+.hero { position: relative; margin: -18px -18px 4px; background: var(--bg-2); overflow: hidden; }
+.hero img { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity .35s var(--ease-out); }
+.hero.in img { opacity: 1; }
+.hero.fill img { object-fit: cover; }
+.hero.fit img { object-fit: contain; padding: 14px; }
+.hero.plate { background: #f6f5f1; }
+.hero.plate img { mix-blend-mode: multiply; }
+.hero::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 -1px 0 var(--line); pointer-events: none; }
+.hero .credit { position: absolute; right: 8px; bottom: 8px; padding: 2px 7px; border-radius: 6px; font-size: 11px; color: #f5f4f0; background: rgb(20 20 18 / .55); text-decoration: none; opacity: 0; transition: opacity .2s; }
+.hero:hover .credit, .hero .credit:focus-visible { opacity: 1; }
+@media (hover: none) { .hero .credit { opacity: .9; } }
+
+.pal-it .th { width: 36px; height: 36px; flex: none; border-radius: 7px; overflow: hidden; background: var(--bg-3); display: grid; place-items: center; }
+.pal-it .th img { width: 100%; height: 100%; object-fit: cover; }
+.gimg { margin: -16px -18px 4px; }
+.gcard .gth { display: block; height: 120px; background: var(--bg-2); overflow: hidden; }
+.gcard .gth img { width: 100%; height: 100%; object-fit: cover; }
+.gcard .gth.none { display: none; }
+@media (max-width: 760px) {
+  .hero { margin: -16px -16px 4px; }
+  .card h1 { font-size: 34px; }
+  .hello h1 { font-size: 36px; }
+  .gcard .gth { height: 90px; }
+}
+.gcard { overflow: hidden; }

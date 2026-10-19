@@ -13,7 +13,7 @@ Merge rules:
 - Edges to unknown ids, edges back in time and edges closing a cycle are
   dropped.
 """
-import glob, json, os, sys
+import glob, json, os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "data")
@@ -25,7 +25,7 @@ OVERRIDE = {  # bad titles found by validation -> correct article
 cache = json.load(open(os.path.join(HERE, ".wikicache.json")))
 
 files = [os.path.join(DATA, "spine.json")] + sorted(
-    f for f in glob.glob(os.path.join(DATA, "*.json")) if not f.endswith("spine.json"))
+    f for f in glob.glob(os.path.join(DATA, "*.json")) if not f.endswith(("spine.json", "images.json")))
 
 nodes, by_id, alias, log = [], {}, {}, []
 for f in files:
@@ -118,7 +118,17 @@ open(os.path.join(SITE, "techtree.json"), "w", encoding="utf-8").write(dataset)
 with open(os.path.join(BUILD, "build.log"), "w") as f:
     f.write("\n".join(log) + "\n")
 
-rows = [[n["id"], n["name"], n["year"], n["cat"], n["wiki"], n["req"], n["desc"]] for n in nodes]
+# lead images from Wikipedia (see fetch_images.py), stored compactly as
+# [path under upload.wikimedia.org/wikipedia/, width, height, 1 if a /thumb/ URL can be built]
+IMG_RE = re.compile(r"wikipedia/([a-z]+)/(?:thumb/)?([0-9a-f]/[0-9a-f]{2}/[^/?]+)")
+images = {}
+img_path = os.path.join(DATA, "images.json")
+if os.path.exists(img_path):
+    for title, v in json.load(open(img_path, encoding="utf-8")).items():
+        m = v and IMG_RE.search(v[0])
+        if m:
+            images[title] = [m.group(1) + "/" + m.group(2), v[1], v[2], 1 if "/thumb/" in v[0] else 0]
+rows = [[n["id"], n["name"], n["year"], n["cat"], n["wiki"], n["req"], n["desc"], images.get(n["wiki"], 0)] for n in nodes]
 data = json.dumps(rows, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
 part = lambda f: open(os.path.join(HERE, "parts", f), encoding="utf-8").read()
 page = (open(os.path.join(HERE, "template.html"), encoding="utf-8").read()

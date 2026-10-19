@@ -4,7 +4,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2026%2026%22%3E%3Cstyle%3Epath%7Bstroke%3A%231d1c1a%7Dcircle%7Bfill%3A%231d1c1a%7D%40media%20%28prefers-color-scheme%3Adark%29%7Bpath%7Bstroke%3A%23ecebe8%7Dcircle%7Bfill%3A%23ecebe8%7D%7D%3C/style%3E%3Cpath%20d%3D%22M8%203v20M8%208c0%203%203%204%207%204M8%2015c0%203%204%204%2010%204%22%20fill%3D%22none%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22/%3E%3Ccircle%20cx%3D%228%22%20cy%3D%223%22%20r%3D%222.6%22/%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2212%22%20r%3D%222.6%22/%3E%3Ccircle%20cx%3D%2219%22%20cy%3D%2219%22%20r%3D%222.6%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap">
 <style>
 /* Layout: app shell. 56px toolbar; Explore = path bar + Miller columns + inspector; Index = filter bar + virtualized register. Monochrome UI, category hue is the only color. */
 :root {
@@ -410,7 +410,7 @@ const ERAS = [
 const eraIdx = y => { for (let i = 0; i < ERAS.length; i++) if (y < ERAS[i][3]) return i; return ERAS.length - 1; };
 
 /* ---------- model ---------- */
-const N = RAW.map((r, i) => ({ i, id: r[0], name: r[1], year: r[2], cat: r[3], wiki: r[4], req: r[5], desc: r[6], kids: [] }));
+const N = RAW.map((r, i) => ({ i, id: r[0], name: r[1], year: r[2], cat: r[3], wiki: r[4], req: r[5], desc: r[6], img: r[7] || null, kids: [] }));
 const byId = new Map(N.map(n => [n.id, n]));
 for (const n of N) { n.req = n.req.map(id => byId.get(id)).filter(Boolean); for (const p of n.req) p.kids.push(n); n.era = eraIdx(n.year); }
 const byYear = (a, b) => a.year - b.year || (a.name < b.name ? -1 : 1);
@@ -454,6 +454,27 @@ function yr(y) {
 const wikiUrl = t => "https://en.wikipedia.org/wiki/" + encodeURIComponent(t.replace(/ /g, "_")).replace(/%2F/g, "/").replace(/%3A/g, ":").replace(/%2C/g, ",").replace(/%28/g, "(").replace(/%29/g, ")");
 const H = n => CATS[n.cat][1];
 const dot = n => `<span class="dot" style="--h:${H(n)}"></span>`;
+// Wikipedia lead images: n.img = [repo/a/ab/file, width, height, thumbable]
+const IMG_OK = /\.(jpe?g|png|gif|svg|webp)$/i;
+const SHOW_IMAGES = !/claudeusercontent|claude\.ai/.test(location.hostname);
+const hasImg = n => SHOW_IMAGES && n.img && IMG_OK.test(n.img[0]);
+function imgUrl(n, w) {
+  const [p, W, , thumb] = n.img, parts = p.split("/"), repo = parts[0], file = parts[3];
+  const base = "https://upload.wikimedia.org/wikipedia/" + repo + "/";
+  if (!thumb) return base + parts.slice(1).join("/");
+  return `${base}thumb/${parts[1]}/${parts[2]}/${file}/${Math.min(w, W)}px-${file}${/\.svg$/i.test(file) ? ".png" : ""}`;
+}
+const imgSource = n => { const p = n.img[0].split("/"); return (p[0] === "commons" ? "https://commons.wikimedia.org/wiki/File:" : "https://en.wikipedia.org/wiki/File:") + p[3]; };
+function hero(n) {
+  if (!hasImg(n)) return "";
+  const [p, W, Hh] = n.img, ar = W / Hh, svg = /\.svg$/i.test(p);
+  const fill = !svg && ar >= 1.15 && ar <= 2.6;
+  const box = fill ? Math.min(Math.max(ar, 1.45), 2.1) : 16 / 10;
+  return `<figure class="hero ${fill ? "fill" : "fit"}${svg ? " plate" : ""}" style="aspect-ratio:${box.toFixed(3)}">
+    <img src="${imgUrl(n, 960)}" alt="" loading="eager" decoding="async" onload="this.parentNode.classList.add('in')" onerror="this.parentNode.remove()">
+    <a class="credit" href="${imgSource(n)}" target="_blank" rel="noopener" title="Image source">Wikimedia</a></figure>`;
+}
+const thumb = (n, cls = "th") => hasImg(n) ? `<span class="${cls}"><img src="${imgUrl(n, 120)}" alt="" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('none');this.remove()"></span>` : `<span class="${cls} none">${dot(n)}</span>`;
 const ICON_EXT = `<svg class="icon" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3H3.5v9.5H13V10M9 3h4v4M13 3 7.5 8.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 const CHEV = `<svg class="chev" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="m4.5 2.5 3.5 3.5-3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
@@ -592,7 +613,7 @@ function renderInsp(n) {
   }
   const lin = lineage(n);
   el.innerHTML = `<article class="card fade">
-    <section class="blk intro"><div>
+    <section class="blk intro">${hero(n)}<div>
       <div class="meta-row"><button class="pill btn" data-cat="${n.cat}">${dot(n)}${CATS[n.cat][0]}</button><span class="pill">${ERAS[n.era][1]}</span></div>
       <h1>${esc(n.name)}</h1>
       <div class="when">${fmtYear(n.year)}</div>
@@ -708,7 +729,7 @@ function renderPal(qv, moveOnly) {
   if (moveOnly) { L.querySelectorAll("[data-i]").forEach(b => b.setAttribute("aria-selected", +b.dataset.i === palSel)); const s = L.querySelector('[aria-selected="true"]'); s && s.scrollIntoView({ block: "nearest" }); return; }
   if (!palHits.length) { L.innerHTML = `<div class="pal-empty">No technology matches “${esc(qv.trim())}”. Try a broader word.</div>`; return; }
   const head = qv.trim() ? "" : `<div class="pal-h">${recent.length ? "Recent" : "Most built upon"}</div>`;
-  const items = palHits.map((n, i) => `<button class="pal-it" role="option" data-i="${i}" data-id="${n.id}" aria-selected="${i === palSel}">${dot(n)}<span class="tx"><span class="nm">${hl(n.name, qv)}</span><span class="sub">${CATS[n.cat][0]} · ${esc(n.desc)}</span></span><span class="yr">${yr(n.year)}</span></button>`).join("");
+  const items = palHits.map((n, i) => `<button class="pal-it" role="option" data-i="${i}" data-id="${n.id}" aria-selected="${i === palSel}">${thumb(n)}<span class="tx"><span class="nm">${hl(n.name, qv)}</span><span class="sub">${CATS[n.cat][0]} · ${esc(n.desc)}</span></span><span class="yr">${yr(n.year)}</span></button>`).join("");
   L.innerHTML = scrimEl.classList.contains("dock") ? items + head : head + items;
 }
 window.addEventListener("resize", () => { if (scrimEl && scrimEl.classList.contains("dock")) closePalette(); });
