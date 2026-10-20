@@ -229,5 +229,5 @@
 {"id": "icebox", "name": "Icebox", "year": 1803, "cat": "agriculture", "wiki": "Icebox", "req": ["ice_house"], "desc": "Insulated cabinet cooled by blocks of ice, the domestic forerunner of the refrigerator."},
 {"id": "sliced_bread", "name": "Sliced bread", "year": 1928, "cat": "agriculture", "wiki": "Sliced bread", "req": ["bread", "electric_motor"], "desc": "Machine-sliced and wrapped bread, first sold in 1928."},
 {"id": "pascalization", "name": "High-pressure processing", "year": 1990, "cat": "agriculture", "wiki": "Pascalization", "req": ["pasteurization"], "desc": "Preserving food with very high pressure instead of heat."},
-{"id": "veggie_burger", "name": "Veggie burger", "year": 1982, "cat": "agriculture", "wiki": "Veggie burger", "req": ["textured_vegetable_protein"], "desc": "Commercial meatless burger patty made from vegetables, grains or soy."}
+{"id": "veggie_burger", "name": "Veggie burger", "year": 1982, "cat": "agriculture", "wiki": "Veggie burger", "req": ["tofu", "soybean"], "desc": "Commercial meatless burger patty made from vegetables, grains or soy."}
 ]

@@ -155,7 +155,7 @@
 {"id": "c_language", "name": "C", "year": 1972, "cat": "computing", "wiki": "C (programming language)", "req": ["algol", "unix"], "desc": "Ritchie's systems language for Unix, still the base of most operating systems."},
 {"id": "smalltalk", "name": "Smalltalk", "year": 1972, "cat": "computing", "wiki": "Smalltalk", "req": ["object_oriented_programming"], "desc": "A pure object-oriented language and environment from Xerox PARC."},
 {"id": "prolog", "name": "Prolog", "year": 1972, "cat": "computing", "wiki": "Prolog", "req": ["lisp"], "desc": "A logic programming language used in AI and natural language work."},
-{"id": "version_control", "name": "Version control", "year": 1972, "cat": "computing", "wiki": "Version control", "req": ["unix"], "desc": "Tracking changes to files over time, starting with SCCS."},
+{"id": "version_control", "name": "Version control", "year": 1972, "cat": "computing", "wiki": "Version control", "req": ["ibm_system_360"], "desc": "Tracking changes to files over time, starting with SCCS."},
 {"id": "framebuffer", "name": "Framebuffer", "year": 1972, "cat": "computing", "wiki": "Framebuffer", "req": ["dram", "computer_graphics"], "desc": "Memory holding a full screen of pixels for raster displays."},
 {"id": "computer_graphics_3d", "name": "3D computer graphics", "year": 1972, "cat": "computing", "wiki": "3D computer graphics", "req": ["computer_graphics"], "desc": "Rendering three-dimensional models as images."},
 {"id": "xerox_alto", "name": "Xerox Alto", "year": 1973, "cat": "computing", "wiki": "Xerox Alto", "req": ["online_system", "framebuffer", "mouse"], "desc": "A PARC workstation with a bitmapped display, mouse and networked GUI."},
