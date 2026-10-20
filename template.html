@@ -686,13 +686,16 @@ const conn = navigator.connection || {};
 const saveData = !!conn.saveData || /(^|-)2g$/.test(conn.effectiveType || "");
 const cld = (clip, opts, ext = "") => `https://res.cloudinary.com/${CLOUDINARY}/video/upload/${opts}/lineage/${clip.id}${ext}`;
 const clipWidth = el => { const w = (el.clientWidth || 960) * Math.min(devicePixelRatio || 1, 2); return w <= 700 ? 640 : w <= 1100 ? 960 : 1280; };
+// Safari often claims WebM support but fails to play it, so Apple browsers always get H.264 MP4
+const isApple = /Apple/.test(navigator.vendor || "") || /iPhone|iPad|iPod/.test(navigator.userAgent);
+const useWebm = () => !isApple && !!document.createElement("video").canPlayType('video/webm; codecs="vp9"');
+const mp4Src = (clip, w) => cld(clip, `w_${w},c_limit,q_auto:eco,vc_auto,ac_none`, ".mp4");
 function clipSource(clip, w) {
   if (CLOUDINARY) {
-    const vp9 = !!document.createElement("video").canPlayType('video/webm; codecs="vp9"');
+    const vp9 = useWebm();
     return { src: cld(clip, `w_${w},c_limit,q_auto:eco${vp9 ? "" : ",vc_auto"},ac_none`, vp9 ? ".webm" : ".mp4"), start: 0, end: CLIP_SECONDS + 0.7 };
   }
-  const webm = !!document.createElement("video").canPlayType("video/webm");
-  return { src: webm ? clip.webm : (clip.mp4 || clip.webm), start: clip.start, end: clip.start + CLIP_SECONDS };
+  return { src: useWebm() ? clip.webm : (clip.mp4 || clip.webm), start: clip.start, end: clip.start + CLIP_SECONDS };
 }
 const clipPoster = (clip, w) => CLOUDINARY ? cld(clip, `so_1,w_${w},c_limit,q_auto`, ".jpg") : "";
 // plays the reel in every visible hero: ~10s per clip, crossfading between two video layers
@@ -722,10 +725,13 @@ function startReels() {
       v.addEventListener("loadedmetadata", () => { v.currentTime = +v.dataset.start; v.playbackRate = 0.75; });
       v.addEventListener("timeupdate", () => { if (v.currentTime > +v.dataset.end) v.currentTime = +v.dataset.start; });
       v.addEventListener("error", () => {
-        if (!v.dataset.fallback || !v._clip) return; // Cloudinary failed: stream the original from Wikimedia instead
-        v.dataset.fallback = "";
-        const webm = !!v.canPlayType("video/webm"), c = v._clip;
-        v.dataset.start = c.start; v.dataset.end = c.start + CLIP_SECONDS; v.src = webm ? c.webm : (c.mp4 || c.webm); v.load();
+        if (!v.dataset.fallback || !v._clip) return;
+        const c = v._clip;
+        if (/\.webm$/.test(v.currentSrc || v.src) && /cloudinary/.test(v.src)) { v.src = mp4Src(c, w); v.load(); } // WebM failed: try MP4
+        else { // Cloudinary failed: stream the original from Wikimedia instead (MP4 rendition)
+          v.dataset.fallback = "";
+          v.dataset.start = c.start; v.dataset.end = c.start + CLIP_SECONDS; v.src = c.mp4 || c.webm; v.load();
+        }
         if (v.classList.contains("on") && !still) v.play().catch(() => {});
       });
     });

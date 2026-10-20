@@ -356,3 +356,21 @@ body[data-sel=""] .browser { background: #0b0b0a; }
 .lens-view video { filter: grayscale(1) sepia(.12) contrast(1.06) brightness(.78) blur(.7px); }
 .lens-view video.color { filter: sepia(.18) saturate(.82) contrast(1.06) brightness(.8) blur(.4px); }
 .lens-view video { object-fit: cover; }
+
+/* ---------- phone landing: fill the space, caption at the bottom ---------- */
+@media (max-width: 760px) {
+  body[data-sel=""] #insp { display: flex; flex-direction: column; overflow: hidden; }
+  body[data-sel=""] .hello { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 0; }
+  body[data-sel=""] .hello .land-wrap { flex: 1; min-height: 0; display: flex; }
+  body[data-sel=""] .hello .land-wrap .land { min-height: 0; height: 100%; }
+  .land.lens .land-in { margin-top: auto; margin-bottom: 0; padding: 20px 20px 64px; gap: 16px; }
+  .land.lens .land-h { font-size: clamp(30px, 8.6vw, 38px); }
+  .land-sug { gap: 6px; }
+  .sug { height: 32px; padding: 0 12px; font-size: 13px; }
+  .land-roots span { font-size: 10.5px; }
+  .root { font-size: 13.5px; }
+  .land-foot { font-size: 12.5px; }
+  .land-cap.reel-cap { top: auto; bottom: 14px; left: 20px; right: 20px; flex-direction: row; align-items: baseline; justify-content: space-between; gap: 10px; text-align: left; }
+  .reel-name { font-size: 15px; white-space: nowrap; }
+  .reel-credit { font-size: 10.5px; max-width: none; flex: 1; min-width: 0; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
