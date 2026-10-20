@@ -530,18 +530,222 @@ function heroNode() {
   return heroPick;
 }
 const SUGGEST = ["wheel", "writing", "printing_press", "steam_engine", "penicillin", "transistor", "internet", "smartphone"];
+// zero-state reel: archival clips (Wikimedia Commons), each tied to an entry
+const REEL = [
+ {
+  "id": "steam_locomotive",
+  "credit": "Arrival of a Train at La Ciotat (Lumière brothers, 1895)",
+  "page": "https://commons.wikimedia.org/wiki/File:Arrival_of_a_Train_at_La_Ciotat_(The_Lumi%C3%A8re_Brothers,_1895).webm",
+  "webm": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Arrival_of_a_Train_at_La_Ciotat_%28The_Lumi%C3%A8re_Brothers%2C_1895%29.webm",
+  "mp4": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/1a/Arrival_of_a_Train_at_La_Ciotat_%28The_Lumi%C3%A8re_Brothers%2C_1895%29.webm/Arrival_of_a_Train_at_La_Ciotat_%28The_Lumi%C3%A8re_Brothers%2C_1895%29.webm.360p.mpeg4.mov",
+  "start": 6,
+  "end": 40,
+  "license": null,
+  "color": false,
+  "orig": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Arrival_of_a_Train_at_La_Ciotat_%28The_Lumi%C3%A8re_Brothers%2C_1895%29.webm"
+ },
+ {
+  "id": "phonograph",
+  "credit": "The Stenographer’s Friend (Edison, 1910)",
+  "page": "https://commons.wikimedia.org/wiki/File:The_stenographers_friend_or_What_was_accomplished_by_an_Edison_business_phonograph.webm",
+  "webm": "https://upload.wikimedia.org/wikipedia/commons/e/ec/The_stenographers_friend_or_What_was_accomplished_by_an_Edison_business_phonograph.webm?utm_source=commons.wikimedia.org&utm_campaign=api&utm_content=original",
+  "mp4": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ec/The_stenographers_friend_or_What_was_accomplished_by_an_Edison_business_phonograph.webm/The_stenographers_friend_or_What_was_accomplished_by_an_Edison_business_phonograph.webm.360p.mpeg4.mov",
+  "start": 35,
+  "end": 75,
+  "license": null,
+  "color": false,
+  "orig": "https://upload.wikimedia.org/wikipedia/commons/e/ec/The_stenographers_friend_or_What_was_accomplished_by_an_Edison_business_phonograph.webm"
+ },
+ {
+  "id": "airplane",
+  "credit": "First flights in aviation history",
+  "page": "https://commons.wikimedia.org/wiki/File:First_flights_in_aviation_history.ogv",
+  "webm": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a8/First_flights_in_aviation_history.ogv/First_flights_in_aviation_history.ogv.240p.vp9.webm",
+  "mp4": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a8/First_flights_in_aviation_history.ogv/First_flights_in_aviation_history.ogv.360p.mpeg4.mov",
+  "start": 40,
+  "end": 76,
+  "license": null,
+  "color": false,
+  "orig": "https://upload.wikimedia.org/wikipedia/commons/a/a8/First_flights_in_aviation_history.ogv"
+ },
+ {
+  "id": "assembly_line",
+  "credit": "Ford Model T assembly (c. 1924)",
+  "page": "https://commons.wikimedia.org/wiki/File:Model_T_assembling_circa_1924.webm",
+  "webm": "https://upload.wikimedia.org/wikipedia/commons/3/32/Model_T_assembling_circa_1924.webm?utm_source=commons.wikimedia.org&utm_campaign=api&utm_content=original",
+  "mp4": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/32/Model_T_assembling_circa_1924.webm/Model_T_assembling_circa_1924.webm.360p.mpeg4.mov",
+  "start": 15,
+  "end": 60,
+  "license": null,
+  "color": false,
+  "orig": "https://upload.wikimedia.org/wikipedia/commons/3/32/Model_T_assembling_circa_1924.webm"
+ },
+ {
+  "id": "rotary_printing_press",
+  "credit": "Newspaper printing (Sweden, 1937)",
+  "page": "https://commons.wikimedia.org/wiki/File:Tidningstryck_1937.ogv",
+  "webm": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/be/Tidningstryck_1937.ogv/Tidningstryck_1937.ogv.480p.vp9.webm",
+  "mp4": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/be/Tidningstryck_1937.ogv/Tidningstryck_1937.ogv.360p.mpeg4.mov",
+  "start": 20,
+  "end": 60,
+  "license": null,
+  "color": false,
+  "orig": "https://upload.wikimedia.org/wikipedia/commons/b/be/Tidningstryck_1937.ogv"
+ },
+ {
+  "id": "electronic_computer",
+  "credit": "Harwell Dekatron computer (1951), filmed by Nealmcb",
+  "page": "https://commons.wikimedia.org/wiki/File:Harwell_Dekatron_Computer_in_action_at_The_National_Museum_Of_Computing.webm",
+  "webm": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ed/Harwell_Dekatron_Computer_in_action_at_The_National_Museum_Of_Computing.webm/Harwell_Dekatron_Computer_in_action_at_The_National_Museum_Of_Computing.webm.480p.vp9.webm",
+  "mp4": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ed/Harwell_Dekatron_Computer_in_action_at_The_National_Museum_Of_Computing.webm/Harwell_Dekatron_Computer_in_action_at_The_National_Museum_Of_Computing.webm.360p.mpeg4.mov",
+  "start": 3,
+  "end": 40,
+  "license": "CC BY-SA 4.0",
+  "color": true,
+  "orig": "https://upload.wikimedia.org/wikipedia/commons/e/ed/Harwell_Dekatron_Computer_in_action_at_The_National_Museum_Of_Computing.webm"
+ },
+ {
+  "id": "polio_vaccine",
+  "credit": "Salk vaccine arrives at Schiphol (Polygoon, 1957)",
+  "page": "https://commons.wikimedia.org/wiki/File:Grote_zending_Salkvaccin_arriveert_op_Schiphol-508786.ogv",
+  "webm": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/31/Grote_zending_Salkvaccin_arriveert_op_Schiphol-508786.ogv/Grote_zending_Salkvaccin_arriveert_op_Schiphol-508786.ogv.480p.vp9.webm",
+  "mp4": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/31/Grote_zending_Salkvaccin_arriveert_op_Schiphol-508786.ogv/Grote_zending_Salkvaccin_arriveert_op_Schiphol-508786.ogv.360p.mpeg4.mov",
+  "start": 2,
+  "end": 30,
+  "license": "CC BY-SA 3.0 NL",
+  "color": false,
+  "orig": "https://upload.wikimedia.org/wikipedia/commons/3/31/Grote_zending_Salkvaccin_arriveert_op_Schiphol-508786.ogv"
+ },
+ {
+  "id": "saturn_v",
+  "credit": "Apollo 11 launch (NASA, 1969)",
+  "page": "https://commons.wikimedia.org/wiki/File:Flight_of_AS-506_(Apollo_11)_from_lift-off_to_1_min_after_S-IC_stage_separation,_VJSC_1425D-q1.ogv",
+  "webm": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3f/Flight_of_AS-506_%28Apollo_11%29_from_lift-off_to_1_min_after_S-IC_stage_separation%2C_VJSC_1425D-q1.ogv/Flight_of_AS-506_%28Apollo_11%29_from_lift-off_to_1_min_after_S-IC_stage_separation%2C_VJSC_1425D-q1.ogv.480p.vp9.webm",
+  "mp4": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3f/Flight_of_AS-506_%28Apollo_11%29_from_lift-off_to_1_min_after_S-IC_stage_separation%2C_VJSC_1425D-q1.ogv/Flight_of_AS-506_%28Apollo_11%29_from_lift-off_to_1_min_after_S-IC_stage_separation%2C_VJSC_1425D-q1.ogv.360p.mpeg4.mov",
+  "start": 5,
+  "end": 35,
+  "license": null,
+  "color": true,
+  "orig": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Flight_of_AS-506_%28Apollo_11%29_from_lift-off_to_1_min_after_S-IC_stage_separation%2C_VJSC_1425D-q1.ogv"
+ },
+ {
+  "id": "boeing_747",
+  "credit": "NASA Shuttle Carrier Aircraft, a modified 747 (NASA)",
+  "page": "https://commons.wikimedia.org/wiki/File:SCA_takeoff_and_landing.ogv",
+  "webm": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d4/SCA_takeoff_and_landing.ogv/SCA_takeoff_and_landing.ogv.480p.vp9.webm",
+  "mp4": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d4/SCA_takeoff_and_landing.ogv/SCA_takeoff_and_landing.ogv.360p.mpeg4.mov",
+  "start": 1,
+  "end": 29,
+  "license": null,
+  "color": true,
+  "orig": "https://upload.wikimedia.org/wikipedia/commons/d/d4/SCA_takeoff_and_landing.ogv"
+ },
+ {
+  "id": "human_genome_project",
+  "credit": "Human genome announcement, White House (2000)",
+  "page": "https://commons.wikimedia.org/wiki/File:Announcing_the_Completion_of_the_First_Survey_of_the_Entire_Human_Genome_at_the_White_House_(2000).webm",
+  "webm": "https://upload.wikimedia.org/wikipedia/commons/9/99/Announcing_the_Completion_of_the_First_Survey_of_the_Entire_Human_Genome_at_the_White_House_%282000%29.webm?utm_source=commons.wikimedia.org&utm_campaign=api&utm_content=original",
+  "mp4": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/99/Announcing_the_Completion_of_the_First_Survey_of_the_Entire_Human_Genome_at_the_White_House_%282000%29.webm/Announcing_the_Completion_of_the_First_Survey_of_the_Entire_Human_Genome_at_the_White_House_%282000%29.webm.360p.mpeg4.mov",
+  "start": 140,
+  "end": 190,
+  "license": null,
+  "color": true,
+  "orig": "https://upload.wikimedia.org/wikipedia/commons/9/99/Announcing_the_Completion_of_the_First_Survey_of_the_Entire_Human_Genome_at_the_White_House_%282000%29.webm"
+ },
+ {
+  "id": "ingenuity",
+  "credit": "Ingenuity helicopter, first flight on Mars (NASA/JPL, 2021)",
+  "page": "https://commons.wikimedia.org/wiki/File:First_Video_of_NASA%E2%80%99s_Ingenuity_Mars_Helicopter_in_Flight,_Includes_Takeoff_and_Landing_(High-Res)_(720p_30fps_H264-192kbit_AAC).webm",
+  "webm": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ea/First_Video_of_NASA%E2%80%99s_Ingenuity_Mars_Helicopter_in_Flight%2C_Includes_Takeoff_and_Landing_%28High-Res%29_%28720p_30fps_H264-192kbit_AAC%29.webm/First_Video_of_NASA%E2%80%99s_Ingenuity_Mars_Helicopter_in_Flight%2C_Includes_Takeoff_and_Landing_%28High-Res%29_%28720p_30fps_H264-192kbit_AAC%29.webm.480p.vp9.webm",
+  "mp4": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ea/First_Video_of_NASA%E2%80%99s_Ingenuity_Mars_Helicopter_in_Flight%2C_Includes_Takeoff_and_Landing_%28High-Res%29_%28720p_30fps_H264-192kbit_AAC%29.webm/First_Video_of_NASA%E2%80%99s_Ingenuity_Mars_Helicopter_in_Flight%2C_Includes_Takeoff_and_Landing_%28High-Res%29_%28720p_30fps_H264-192kbit_AAC%29.webm.360p.mpeg4.mov",
+  "start": 4,
+  "end": 48,
+  "license": null,
+  "color": true,
+  "orig": "https://upload.wikimedia.org/wikipedia/commons/e/ea/First_Video_of_NASA%E2%80%99s_Ingenuity_Mars_Helicopter_in_Flight%2C_Includes_Takeoff_and_Landing_%28High-Res%29_%28720p_30fps_H264-192kbit_AAC%29.webm"
+ }
+];
 function heroPane() {
-  const h = heroNode();
   const sug = SUGGEST.map(id => byId.get(id)).filter(Boolean);
-  return `<section class="land${h ? "" : " plain"}">
-    ${h ? `<div class="land-img"><img src="${imgUrl(h, 1280)}" alt="" decoding="async" onload="this.parentNode.classList.add('in')" onerror="this.closest('.land').classList.add('plain')"></div>` : ""}
+  return `<section class="land lens reel">
+    <div class="lens-view"><video muted playsinline preload="auto" disablepictureinpicture></video><video muted playsinline preload="auto" disablepictureinpicture></video></div>
     <div class="land-in">
       <h1 class="land-h">See how one technology led to another.</h1>
       <div class="land-sug">${sug.map(n => `<button class="sug" data-id="${n.id}">${esc(n.name)}</button>`).join("")}</div>
+      <div class="land-roots"><span>Or start at the very beginning</span>${roots.map(n => `<button class="root" data-id="${n.id}">${esc(n.name)}</button>`).join("")}</div>
       <p class="land-foot">Or search below. Missing something? ${suggestLink("new-technology", { title: "Add: " }, "Suggest it")}.</p>
     </div>
-    ${h ? `<button class="land-cap" data-id="${h.id}">${esc(h.name)}, ${yr(h.year)}</button>` : ""}
+    <div class="land-cap reel-cap"><button class="reel-name" data-id=""></button><a class="reel-credit" target="_blank" rel="noopener"></a></div>
   </section>`;
+}
+// clip delivery: trimmed segments live in Cloudinary (lineage/<id>, made by media/make_cuts), which resizes them
+// and picks the best format per browser; if Cloudinary fails, clips stream from Wikimedia and are trimmed in the player
+const CLOUDINARY = "daij1adry";
+const CLIP_SECONDS = 12;
+const conn = navigator.connection || {};
+const saveData = !!conn.saveData || /(^|-)2g$/.test(conn.effectiveType || "");
+const cld = (clip, opts, ext = "") => `https://res.cloudinary.com/${CLOUDINARY}/video/upload/${opts}/lineage/${clip.id}${ext}`;
+const clipWidth = el => { const w = (el.clientWidth || 960) * Math.min(devicePixelRatio || 1, 2); return w <= 700 ? 640 : w <= 1100 ? 960 : 1280; };
+function clipSource(clip, w) {
+  if (CLOUDINARY) {
+    const vp9 = !!document.createElement("video").canPlayType('video/webm; codecs="vp9"');
+    return { src: cld(clip, `w_${w},c_limit,q_auto:eco${vp9 ? "" : ",vc_auto"},ac_none`, vp9 ? ".webm" : ".mp4"), start: 0, end: CLIP_SECONDS + 0.7 };
+  }
+  const webm = !!document.createElement("video").canPlayType("video/webm");
+  return { src: webm ? clip.webm : (clip.mp4 || clip.webm), start: clip.start, end: clip.start + CLIP_SECONDS };
+}
+const clipPoster = (clip, w) => CLOUDINARY ? cld(clip, `so_1,w_${w},c_limit,q_auto`, ".jpg") : "";
+// plays the reel in every visible hero: ~10s per clip, crossfading between two video layers
+const reels = new Set();
+function startReels() {
+  document.querySelectorAll(".land.reel").forEach(root => {
+    if (root._reel) return;
+    const vids = root.querySelectorAll(".lens-view video"), still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const posterOnly = saveData;
+    const w = clipWidth(root);
+    const st = { i: 0, cur: 0, timer: 0 };
+    root._reel = st; reels.add(root);
+    const load = (v, clip) => {
+      v.poster = clipPoster(clip, w);
+      v.classList.toggle("color", !!clip.color);
+      if (posterOnly) { v.removeAttribute("src"); return; }
+      const s = clipSource(clip, w);
+      v.dataset.start = s.start; v.dataset.end = s.end; v.dataset.fallback = CLOUDINARY ? "1" : "";
+      v._clip = clip; v.src = s.src; v.load();
+    };
+    const caption = clip => {
+      const n = byId.get(clip.id), name = root.querySelector(".reel-name"), cr = root.querySelector(".reel-credit");
+      name.dataset.id = clip.id; name.textContent = n ? `${n.name}, ${yr(n.year)} →` : "";
+      cr.href = clip.page; cr.textContent = clip.credit + (clip.license ? ` · ${clip.license}` : "");
+    };
+    vids.forEach(v => {
+      v.addEventListener("loadedmetadata", () => { v.currentTime = +v.dataset.start; v.playbackRate = 0.75; });
+      v.addEventListener("timeupdate", () => { if (v.currentTime > +v.dataset.end) v.currentTime = +v.dataset.start; });
+      v.addEventListener("error", () => {
+        if (!v.dataset.fallback || !v._clip) return; // Cloudinary failed: stream the original from Wikimedia instead
+        v.dataset.fallback = "";
+        const webm = !!v.canPlayType("video/webm"), c = v._clip;
+        v.dataset.start = c.start; v.dataset.end = c.start + CLIP_SECONDS; v.src = webm ? c.webm : (c.mp4 || c.webm); v.load();
+        if (v.classList.contains("on") && !still) v.play().catch(() => {});
+      });
+    });
+    const reveal = () => root.querySelector(".lens-view").classList.add("in");
+    const show = () => {
+      const clip = REEL[st.i % REEL.length], v = vids[st.cur], other = vids[1 - st.cur];
+      v.classList.add("on"); other.classList.remove("on");
+      if (!still && !posterOnly) v.play().catch(() => {});
+      caption(clip);
+      setTimeout(() => { other.pause(); load(other, REEL[(st.i + 1) % REEL.length]); }, 1600);
+    };
+    load(vids[0], REEL[0]);
+    if (posterOnly) { reveal(); show(); }
+    else vids[0].addEventListener("loadeddata", () => { reveal(); show(); }, { once: true });
+    if (!still) st.timer = setInterval(() => {
+      if (!document.body.contains(root)) { clearInterval(st.timer); reels.delete(root); return; }
+      if (root.offsetParent === null) return; // hidden copy (desktop vs phone)
+      st.i++; st.cur = 1 - st.cur; show();
+    }, 10000);
+  });
 }
 function welcomePane() {
   return `<div class="col-welcome">${heroPane()}</div>`;
@@ -581,7 +785,7 @@ function renderCols(focus) {
     colKeys.push(keys[k]);
   }
   const oldWel = el.querySelector(".col-welcome"); if (oldWel) oldWel.remove();
-  if (!path.length) el.insertAdjacentHTML("beforeend", welcomePane());
+  if (!path.length) { el.insertAdjacentHTML("beforeend", welcomePane()); requestAnimationFrame(startReels); }
   else el.insertAdjacentHTML("beforeend", `<div class="col-pad"></div>`);
   // scroll selected into view in each column; reveal last columns
   el.querySelectorAll(".col").forEach((c, k) => { const s = c.querySelector(".it.sel"); if (s) { const l = c.querySelector(".col-list"); const top = s.offsetTop, bot = top + s.offsetHeight; if (top < l.scrollTop || bot > l.scrollTop + l.clientHeight) l.scrollTop = top - l.clientHeight / 3; } });
@@ -644,6 +848,7 @@ function renderInsp(n) {
     const big = [...N].sort((a, b) => b.nDes - a.nDes).slice(0, 10);
     const cc = {}; for (const x of N) cc[x.cat] = (cc[x.cat] || 0) + 1;
     el.innerHTML = `<div class="hello card fade"><div class="land-wrap">${heroPane()}</div></div>`;
+    requestAnimationFrame(startReels);
     el.scrollTop = 0;
     return;
   }
@@ -678,7 +883,7 @@ $("#cols").addEventListener("click", e => {
   const gt2 = e.target.closest("[data-go-tab]"); if (gt2) { const v = gt2.dataset.goTab; if (v === "explore") go(roots[0], { col: 0 }); else setTab(v); return; }
   if (e.target.closest("[data-shuffle]")) { pickRound++; const g = $("#cols .picks.big"); if (g) g.innerHTML = pickCards(pickSet(12)); return; }
   const gt = e.target.closest("[data-go-tab]"); if (gt) { const v = gt.dataset.goTab; if (v === "explore") { go(roots[0], { col: 0 }); } else setTab(v); return; }
-  const lc = e.target.closest(".land-cap, .sug"); if (lc) { go(byId.get(lc.dataset.id)); return; }
+  const lc = e.target.closest(".reel-name, .sug, .root"); if (lc && lc.dataset.id) { go(byId.get(lc.dataset.id)); return; }
   const pk = e.target.closest(".pick"); if (pk) { go(byId.get(pk.dataset.id)); return; } const b = e.target.closest(".it"); if (b) go(byId.get(b.dataset.id), { col: +b.dataset.col, focus: { col: +b.dataset.col } }); });
 $("#insp").addEventListener("click", e => {
   if (e.target.closest("[data-shuffle]")) { pickRound++; const y = $("#insp").scrollTop; renderInsp(null); $("#insp").scrollTop = y; $("#insp .card")?.classList.remove("fade"); return; }

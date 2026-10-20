@@ -286,3 +286,73 @@ body { font-size: 14.5px; }
 }
 /* Safari ignores border-radius clipping while children animate; clip the shape explicitly */
 .land { clip-path: inset(0 round var(--r-panel)); -webkit-clip-path: inset(0 round var(--r-panel)); }
+
+/* ---------- lens hero: archival film seen through an eyepiece ---------- */
+.land.lens { background: #0b0b0a; }
+.land.lens::before { display: none; }
+.land.lens { container-type: size; }
+.lens-view { position: absolute; z-index: -2; top: 50%; right: 3%; width: min(64cqw, 96cqh); aspect-ratio: 1; transform: translateY(-50%);
+  border-radius: 50%; overflow: hidden; background: #1c1c1a; opacity: 0; transition: opacity 2.4s var(--ease-out);
+  -webkit-mask-image: radial-gradient(circle, #000 58%, rgb(0 0 0 / .85) 64%, transparent 71%); mask-image: radial-gradient(circle, #000 58%, rgb(0 0 0 / .85) 64%, transparent 71%); }
+.lens-view.in { opacity: 1; }
+.lens-view.none { display: none; }
+.lens-view video { position: absolute; inset: -6%; width: 112%; height: 112%; object-fit: cover;
+  filter: grayscale(1) contrast(1.12) brightness(.82) blur(.3px); animation: lensdrift 60s ease-in-out infinite alternate; }
+@keyframes lensdrift { from { transform: scale(1.08) translate(0, 0) rotate(0deg); } to { transform: scale(1.18) translate(-3%, 2%) rotate(1.5deg); } }
+.lens-view::after { content: ""; position: absolute; inset: 0; border-radius: 50%;
+  box-shadow: inset 0 0 120px 40px rgb(0 0 0 / .65); background: radial-gradient(circle at 40% 35%, rgb(255 255 255 / .06), transparent 55%); }
+.land.lens::after { opacity: .42; }
+.land.lens .land-in { position: relative; z-index: 1; margin-top: auto; margin-bottom: auto; max-width: 520px; }
+.land.lens .land-h { font-size: clamp(38px, 4.2vw, 64px); text-shadow: 0 2px 30px rgb(0 0 0 / .6); }
+.land.lens .land-cap { text-decoration: none; }
+@media (max-width: 760px) {
+  .land.lens { container-type: normal; }
+  .lens-view { top: 36%; right: 50%; width: min(118vw, 62dvh); transform: translate(50%, -50%); }
+  .land.lens .land-in { margin-top: auto; margin-bottom: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .lens-view video { animation: none; } }
+
+/* full-frame film: the footage's own grain, a soft vignette, no lens */
+.land.lens { container-type: normal; }
+.lens-view, .land.lens .lens-view { inset: 0; top: 0; right: 0; width: 100%; height: 100%; aspect-ratio: auto; transform: none; border-radius: 0;
+  -webkit-mask-image: none; mask-image: none; background: #141412; }
+.lens-view video { inset: -3%; width: 106%; height: 106%; filter: grayscale(1) sepia(.12) contrast(1.06) brightness(.78); animation: lensdrift 70s ease-in-out infinite alternate; }
+@keyframes lensdrift { from { transform: scale(1.02) translate(0, 0); } to { transform: scale(1.08) translate(-1.5%, -1%); } }
+.lens-view::after { border-radius: 0; background: none;
+  box-shadow: inset 0 0 18vmin 6vmin rgb(8 8 7 / .85);
+  background-image: radial-gradient(ellipse 85% 75% at 58% 48%, transparent 45%, rgb(8 8 7 / .7) 100%),
+                    linear-gradient(90deg, rgb(8 8 7 / .72) 0%, rgb(8 8 7 / .35) 38%, transparent 65%); }
+.land.lens::after { display: none; }
+@media (max-width: 760px) {
+  .lens-view, .land.lens .lens-view { width: 100%; top: 0; right: 0; transform: none; }
+  .lens-view::after { background-image: radial-gradient(ellipse 120% 80% at 50% 40%, transparent 40%, rgb(8 8 7 / .75) 100%), linear-gradient(to top, rgb(8 8 7 / .8) 0%, rgb(8 8 7 / .3) 50%, transparent 75%); }
+}
+
+/* ---------- archival reel ---------- */
+.reel .lens-view video { opacity: 0; transition: opacity 1.4s ease; }
+.reel .lens-view video.on { opacity: 1; }
+.reel-cap { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; text-align: right; pointer-events: auto; background: none !important; }
+.reel-name { border: 0; background: none; padding: 0; color: #f4f2ec; font-family: var(--display); font-size: 17px; cursor: pointer; }
+.reel-name:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.reel-credit { font-size: 11.5px; color: rgb(244 242 236 / .55); text-decoration: none; max-width: 340px; }
+.reel-credit:hover { color: rgb(244 242 236 / .85); text-decoration: underline; }
+.land-cap.reel-cap:hover { background: none; }
+
+/* ---------- zero state: the film owns the whole browsing card ---------- */
+body[data-sel=""] .pathbar { display: none; }
+body[data-sel=""] .cols > .col { display: none; }
+body[data-sel=""] .col-welcome { padding: 0; min-width: 0; }
+body[data-sel=""] .col-welcome .land { border-radius: 0; clip-path: none; -webkit-clip-path: none; }
+body[data-sel=""] .browser { background: #0b0b0a; }
+.land.lens .land-in { max-width: 600px; padding-left: clamp(24px, 5vw, 64px); }
+.land-roots { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; font-size: 13px; color: rgb(244 242 236 / .55); }
+.land-roots span { width: 100%; font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; color: rgb(244 242 236 / .45); margin-bottom: 2px; }
+.root { border: 0; background: none; padding: 0; color: rgb(244 242 236 / .82); font-size: 14px; text-decoration: underline; text-decoration-color: rgb(244 242 236 / .25); text-underline-offset: 4px; }
+.root:hover { color: #f4f2ec; text-decoration-color: rgb(244 242 236 / .7); }
+@media (max-width: 760px) {
+  body[data-sel=""] .browser { display: none; }
+  body[data-sel=""] .card.hello { padding-top: 0; }
+}
+.lens-view video { filter: grayscale(1) sepia(.12) contrast(1.06) brightness(.78) blur(.7px); }
+.lens-view video.color { filter: sepia(.18) saturate(.82) contrast(1.06) brightness(.8) blur(.4px); }
+.lens-view video { object-fit: cover; }

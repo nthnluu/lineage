@@ -6,3 +6,6 @@ backup/
 .DS_Store
 # licensed web fonts, served separately
 fonts/
+media/.src/
+media/reel/
+media/cut/
