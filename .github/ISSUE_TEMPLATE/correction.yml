@@ -1,0 +1,40 @@
+name: Fix an entry
+description: Something about a technology is wrong or could be better.
+title: "Fix: "
+labels: ["correction"]
+body:
+  - type: input
+    id: tech
+    attributes:
+      label: Technology
+      description: Its name, or the part after the # in the page URL.
+      placeholder: transistor
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What's wrong?
+      multiple: true
+      options:
+        - Date
+        - Description
+        - Wikipedia link
+        - What it required
+        - What it led to
+        - Field
+        - It's a duplicate
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: fix
+    attributes:
+      label: What it should be
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source
+      description: A link that backs this up. Optional, but it makes reviewing much faster.

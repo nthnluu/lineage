@@ -1,0 +1,65 @@
+name: Suggest a technology
+description: Something missing from the tree.
+title: "Add: "
+labels: ["new technology"]
+body:
+  - type: input
+    id: name
+    attributes:
+      label: Name
+    validations:
+      required: true
+  - type: input
+    id: wiki
+    attributes:
+      label: Wikipedia article
+      placeholder: https://en.wikipedia.org/wiki/...
+    validations:
+      required: true
+  - type: input
+    id: year
+    attributes:
+      label: Year of the first working example
+      description: Use negative numbers or "BCE" for dates before the common era.
+    validations:
+      required: true
+  - type: dropdown
+    id: field
+    attributes:
+      label: Field
+      options:
+        - Prehistoric foundations
+        - Science and mathematics
+        - Agriculture and food
+        - Materials and chemistry
+        - Construction
+        - Tools and manufacturing
+        - Energy and power
+        - Electronics
+        - Computing
+        - Communication and media
+        - Transport
+        - Aerospace
+        - Medicine
+        - Life sciences
+        - Instruments and measurement
+        - Warfare
+        - Everyday life
+  - type: textarea
+    id: requires
+    attributes:
+      label: What did it directly need?
+      description: Technologies that had to exist first, one per line.
+  - type: textarea
+    id: led_to
+    attributes:
+      label: What did it lead to?
+      description: Optional. Technologies that directly needed this one.
+  - type: textarea
+    id: desc
+    attributes:
+      label: One-line description
+  - type: input
+    id: source
+    attributes:
+      label: Source

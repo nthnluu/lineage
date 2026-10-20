@@ -1,0 +1,39 @@
+name: Add or remove a connection
+description: Suggest that one technology did or didn't lead to another.
+title: "Connection: "
+labels: ["connection"]
+body:
+  - type: markdown
+    attributes:
+      value: A connection means the later technology directly needed the earlier one. "The steam locomotive needed the steam engine" counts; "it was inspired by" doesn't.
+  - type: dropdown
+    id: action
+    attributes:
+      label: Add or remove?
+      options:
+        - Add this connection
+        - Remove this connection
+    validations:
+      required: true
+  - type: input
+    id: from
+    attributes:
+      label: Earlier technology (the prerequisite)
+      placeholder: steam_engine
+    validations:
+      required: true
+  - type: input
+    id: to
+    attributes:
+      label: Later technology (the one that needed it)
+      placeholder: steam_locomotive
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+  - type: input
+    id: source
+    attributes:
+      label: Source
