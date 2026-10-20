@@ -284,3 +284,5 @@ body { font-size: 14.5px; }
   .land-cap { top: 10px; bottom: auto; }
   .land-in { padding-bottom: 22px; }
 }
+/* Safari ignores border-radius clipping while children animate; clip the shape explicitly */
+.land { clip-path: inset(0 round var(--r-panel)); -webkit-clip-path: inset(0 round var(--r-panel)); }
