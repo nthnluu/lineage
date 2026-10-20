@@ -13,6 +13,7 @@ body:
       options:
         - Add this connection
         - Remove this connection
+      default: 0
     validations:
       required: true
   - type: input
