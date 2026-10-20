@@ -452,6 +452,10 @@ function yr(y) {
   return String(y);
 }
 const wikiUrl = t => "https://en.wikipedia.org/wiki/" + encodeURIComponent(t.replace(/ /g, "_")).replace(/%2F/g, "/").replace(/%3A/g, ":").replace(/%2C/g, ",").replace(/%28/g, "(").replace(/%29/g, ")");
+const REPO = "https://github.com/nthnluu/lineage";
+// links to the repo's issue forms, with fields filled in
+const suggestUrl = (form, fields) => `${REPO}/issues/new?template=${form}.yml&` + new URLSearchParams(fields);
+const suggestLink = (form, fields, label) => `<a class="suggest" href="${suggestUrl(form, fields)}" target="_blank" rel="noopener">${label}</a>`;
 const H = n => CATS[n.cat][1];
 const dot = n => `<span class="dot" style="--h:${H(n)}"></span>`;
 // Wikipedia lead images: n.img = [repo/a/ab/file, width, height, thumbable]
@@ -498,6 +502,7 @@ function go(n, opt = {}) {
   const cur = path[path.length - 1];
   try { history.replaceState(null, "", cur ? "#" + cur.id : location.pathname + location.search); } catch (e) {}
   if (cur) { recent = [cur.id, ...recent.filter(x => x !== cur.id)].slice(0, 8); store.set("tt-recent", recent.join(",")); }
+  document.body.dataset.sel = cur ? "1" : "";
   renderCols(opt.focus);
   renderPath();
   renderInsp(cur);
@@ -517,6 +522,30 @@ function colBody(list, k) {
   return h || `<div class="col-empty">Nothing in the index builds on this yet.</div>`;
 }
 const colKeys = []; // parent id per rendered column ("" for roots)
+// the zero state's editorial hero: one archival photo per visit
+const HERO_POOL = ["watt_steam_engine", "steam_locomotive", "telescope", "printing_press", "telephone", "airplane", "automobile", "apple_ii", "transistor", "television"];
+let heroPick = null;
+function heroNode() {
+  if (!heroPick) { const pool = HERO_POOL.map(id => byId.get(id)).filter(n => n && overlayable(n)); heroPick = pool[Math.floor(Math.random() * pool.length)] || null; }
+  return heroPick;
+}
+const SUGGEST = ["wheel", "writing", "printing_press", "steam_engine", "penicillin", "transistor", "internet", "smartphone"];
+function heroPane() {
+  const h = heroNode();
+  const sug = SUGGEST.map(id => byId.get(id)).filter(Boolean);
+  return `<section class="land${h ? "" : " plain"}">
+    ${h ? `<div class="land-img"><img src="${imgUrl(h, 1280)}" alt="" decoding="async" onload="this.parentNode.classList.add('in')" onerror="this.closest('.land').classList.add('plain')"></div>` : ""}
+    <div class="land-in">
+      <h1 class="land-h">See how one technology led to another.</h1>
+      <div class="land-sug">${sug.map(n => `<button class="sug" data-id="${n.id}">${esc(n.name)}</button>`).join("")}</div>
+      <p class="land-foot">Or search below. Missing something? ${suggestLink("new-technology", { title: "Add: " }, "Suggest it")}.</p>
+    </div>
+    ${h ? `<button class="land-cap" data-id="${h.id}">${esc(h.name)}, ${yr(h.year)}</button>` : ""}
+  </section>`;
+}
+function welcomePane() {
+  return `<div class="col-welcome">${heroPane()}</div>`;
+}
 function renderCols(focus) {
   const el = $("#cols");
   const want = [""].concat(path.filter(n => n.kids.length).length === path.length ? path.map(n => n.id) : path.map(n => n.id));
@@ -551,7 +580,9 @@ function renderCols(focus) {
     el.appendChild(c);
     colKeys.push(keys[k]);
   }
-  el.insertAdjacentHTML("beforeend", `<div class="col-pad"></div>`);
+  const oldWel = el.querySelector(".col-welcome"); if (oldWel) oldWel.remove();
+  if (!path.length) el.insertAdjacentHTML("beforeend", welcomePane());
+  else el.insertAdjacentHTML("beforeend", `<div class="col-pad"></div>`);
   // scroll selected into view in each column; reveal last columns
   el.querySelectorAll(".col").forEach((c, k) => { const s = c.querySelector(".it.sel"); if (s) { const l = c.querySelector(".col-list"); const top = s.offsetTop, bot = top + s.offsetHeight; if (top < l.scrollTop || bot > l.scrollTop + l.clientHeight) l.scrollTop = top - l.clientHeight / 3; } });
   const lastCol = el.querySelectorAll(".col")[keys.length - 1];
@@ -595,21 +626,24 @@ function ribbon(lin, n) {
   return `<div class="ribbon" aria-hidden="true">${bands}${marks}${ticks}</div>`;
 }
 
+// starter cards on the welcome panel: a curated set first, then random well-connected inventions with photos
+const FEATURED = ["printing_press", "watt_steam_engine", "airplane", "transistor", "telescope", "light_bulb", "smartphone", "steam_locomotive", "apple_ii", "telephone", "saturn_v", "television", "automobile", "radio", "microscope", "compass"];
+let pickRound = 0;
+function pickSet(count = 8) {
+  const pool = N.filter(n => n.nDes >= 15 && overlayable(n));
+  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  const first = pickRound === 0 ? FEATURED.map(id => byId.get(id)).filter(n => n && overlayable(n)) : [];
+  const out = [...new Set([...first, ...pool])].slice(0, count);
+  return out.sort(byYear);
+}
+const pickCards = list => list.map(p => `<button class="pick" data-id="${p.id}"><span class="pi"><img src="${imgUrl(p, 330)}" alt="" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('none');this.remove()"></span><span class="pn">${esc(p.name)}</span><span class="py">${yr(p.year)}</span></button>`).join("");
 function renderInsp(n) {
   const el = $("#insp");
   if (!n) {
     const start = ["smartphone", "large_language_model", "penicillin", "printing_press", "integrated_circuit", "airplane", "nuclear_reactor", "crispr_cas9", "internet", "steam_engine"].map(id => byId.get(id)).filter(Boolean);
     const big = [...N].sort((a, b) => b.nDes - a.nDes).slice(0, 10);
     const cc = {}; for (const x of N) cc[x.cat] = (cc[x.cat] || 0) + 1;
-    el.innerHTML = `<div class="hello card fade">
-      <section class="blk intro"><h1>Every invention stands on others.</h1>
-      <p>An index of ${fmt(N.length)} technologies and the ${fmt(EDGES)} dependencies between them, from the first stone tools to the present. Start from a root and follow what each invention made possible, or search for anything to see the chain behind it. Every entry links to Wikipedia.</p></section>
-      <div class="kpis"><div><b>${fmt(N.length)}</b><span>technologies</span></div><div><b>${fmt(EDGES)}</b><span>dependencies</span></div><div><b>${Math.max(...N.map(x => x.depth))}</b><span>longest chain</span></div></div>
-      <div class="sec"><div class="sec-h">Jump to</div>${chips(start, 99, "w1")}</div>
-      <div class="sec"><div class="sec-h">Most built upon</div>${chips(big, 99, "w2")}</div>
-      <div class="sec"><div class="sec-h">Fields <span class="c">open in Index</span></div><div class="cats">${Object.entries(CATS).filter(([k]) => cc[k]).map(([k, [nm, h]]) => `<button data-cat="${k}"><span class="dot" style="--h:${h}"></span>${nm}<span class="n">${cc[k]}</span></button>`).join("")}</div></div>
-      <div class="sec mob-only" style="display:none"><div class="sec-h">Starting points <span class="c">${roots.length}</span></div>${rows(roots, 99, "roots")}</div>
-    </div>`;
+    el.innerHTML = `<div class="hello card fade"><div class="land-wrap">${heroPane()}</div></div>`;
     el.scrollTop = 0;
     return;
   }
@@ -631,16 +665,23 @@ function renderInsp(n) {
       <div><b>${fmt(n.nDes)}</b><span>built on it since</span></div>
       <div><b>${n.depth}</b><span>generations deep</span></div>
     </div>
-    <div class="sec"><div class="sec-h">Led directly to <span class="c">${n.kids.length}</span></div>${n.kids.length ? chips(n.kids, 18, "k" + n.id, "kids") + rows(n.kids, 30, "k" + n.id) : `<div class="muted">Nothing in the index builds directly on this yet.</div>`}</div>
-    <div class="sec"><div class="sec-h">Required <span class="c">${n.req.length}</span></div>${n.req.length ? chips(n.req, 14, "r" + n.id) : `<div class="muted">A starting point. Nothing in the index comes before it.</div>`}</div>
+    <div class="sec"><div class="sec-h">Led directly to <span class="c">${n.kids.length}</span></div>${n.kids.length ? chips(n.kids, 18, "k" + n.id, "kids") + rows(n.kids, 30, "k" + n.id) : `<div class="muted">Nothing in the index builds directly on this yet.</div>`}${suggestLink("connection", { title: `Connection: ${n.name} → `, from: n.id }, "Suggest something it led to")}</div>
+    <div class="sec"><div class="sec-h">Required <span class="c">${n.req.length}</span></div>${n.req.length ? chips(n.req, 14, "r" + n.id) : `<div class="muted">A starting point. Nothing in the index comes before it.</div>`}${suggestLink("connection", { title: `Connection: → ${n.name}`, to: n.id }, "Suggest a missing prerequisite")}</div>
     ${lin.length > 1 ? `<div class="sec"><div class="sec-h">Longest chain back <span class="c">${lin.length - 1} steps</span></div>${ribbon(lin, n)}
       <ol class="lin">${lin.map(x => `<li class="${x === n ? "here" : ""}"><span class="y">${yr(x.year)}</span><span class="r">${dot(x)}</span><button data-id="${x.id}">${esc(x.name)}</button></li>`).join("")}</ol></div>` : ""}
+    <p class="fixline">Something wrong here? ${suggestLink("correction", { title: `Fix: ${n.name}`, tech: n.id }, "Suggest a correction")}</p>
   </article>`;
   el.scrollTop = 0;
 }
 
-$("#cols").addEventListener("click", e => { const b = e.target.closest(".it"); if (b) go(byId.get(b.dataset.id), { col: +b.dataset.col, focus: { col: +b.dataset.col } }); });
+$("#cols").addEventListener("click", e => {
+  const gt2 = e.target.closest("[data-go-tab]"); if (gt2) { const v = gt2.dataset.goTab; if (v === "explore") go(roots[0], { col: 0 }); else setTab(v); return; }
+  if (e.target.closest("[data-shuffle]")) { pickRound++; const g = $("#cols .picks.big"); if (g) g.innerHTML = pickCards(pickSet(12)); return; }
+  const gt = e.target.closest("[data-go-tab]"); if (gt) { const v = gt.dataset.goTab; if (v === "explore") { go(roots[0], { col: 0 }); } else setTab(v); return; }
+  const lc = e.target.closest(".land-cap, .sug"); if (lc) { go(byId.get(lc.dataset.id)); return; }
+  const pk = e.target.closest(".pick"); if (pk) { go(byId.get(pk.dataset.id)); return; } const b = e.target.closest(".it"); if (b) go(byId.get(b.dataset.id), { col: +b.dataset.col, focus: { col: +b.dataset.col } }); });
 $("#insp").addEventListener("click", e => {
+  if (e.target.closest("[data-shuffle]")) { pickRound++; const y = $("#insp").scrollTop; renderInsp(null); $("#insp").scrollTop = y; $("#insp .card")?.classList.remove("fade"); return; }
   const m = e.target.closest("[data-more]"); if (m) { expanded.add(m.dataset.more); const y = $("#insp").scrollTop; renderInsp(path[path.length - 1]); $("#insp").scrollTop = y; $("#insp .card").classList.remove("fade"); return; }
   const c = e.target.closest("[data-cat]"); if (c) { catOn.clear(); catOn.add(c.dataset.cat); syncCats(); setTab("index"); return; }
   const ix = e.target.closest("[data-index]"); if (ix) { showInIndex(byId.get(ix.dataset.index)); return; }
@@ -731,7 +772,7 @@ function openPalette(initial = "") {
 function renderPal(qv, moveOnly) {
   const L = scrimEl.querySelector("#pal-list");
   if (moveOnly) { L.querySelectorAll("[data-i]").forEach(b => b.setAttribute("aria-selected", +b.dataset.i === palSel)); const s = L.querySelector('[aria-selected="true"]'); s && s.scrollIntoView({ block: "nearest" }); return; }
-  if (!palHits.length) { L.innerHTML = `<div class="pal-empty">No technology matches “${esc(qv.trim())}”. Try a broader word.</div>`; return; }
+  if (!palHits.length) { L.innerHTML = `<div class="pal-empty">No technology matches “${esc(qv.trim())}”. Try a broader word, or ${suggestLink("new-technology", { title: `Add: ${qv.trim()}`, name: qv.trim() }, "suggest adding it")}.</div>`; return; }
   const head = qv.trim() ? "" : `<div class="pal-h">${recent.length ? "Recent" : "Most built upon"}</div>`;
   const items = palHits.map((n, i) => `<button class="pal-it" role="option" data-i="${i}" data-id="${n.id}" aria-selected="${i === palSel}">${thumb(n)}<span class="tx"><span class="nm">${hl(n.name, qv)}</span><span class="sub">${CATS[n.cat][0]} · ${esc(n.desc)}</span></span><span class="yr">${yr(n.year)}</span></button>`).join("");
   L.innerHTML = scrimEl.classList.contains("dock") ? items + head : head + items;
