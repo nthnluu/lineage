@@ -321,9 +321,9 @@ main { flex: 1; min-height: 0; display: flex; }
   </button>
   <div class="bar-r">
     <div class="seg" role="tablist" aria-label="View">
-    <button role="tab" data-tab="explore" aria-selected="true">Explore</button>
-    <button role="tab" data-tab="graph" aria-selected="false">Graph</button>
-  <button role="tab" data-tab="index" aria-selected="false">Index</button>
+    <button role="tab" data-tab="explore" aria-selected="true" title="Explore (1)">Explore</button>
+    <button role="tab" data-tab="graph" aria-selected="false" title="Graph (2)">Graph</button>
+  <button role="tab" data-tab="index" aria-selected="false" title="Index (3)">Index</button>
     </div>
     <button class="ibtn desk-only" id="random" title="Random technology (R)" aria-label="Random technology">
       <svg class="icon" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 4.5h2.2c1.4 0 2.2.7 3 1.8l1.6 2.4c.8 1.1 1.6 1.8 3 1.8H14M2 11.5h2.2c1.4 0 2.2-.7 3-1.8M9.8 6.3c.8-1.1 1.6-1.8 3-1.8H14m-1.6-1.8L14 4.5l-1.6 1.6m0 3.8L14 11.5l-1.6 1.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -331,9 +331,9 @@ main { flex: 1; min-height: 0; display: flex; }
   </div>
 </header>
 <div class="mob-bar"><div class="seg" role="tablist" aria-label="View">
-  <button role="tab" data-tab="explore" aria-selected="true">Explore</button>
-  <button role="tab" data-tab="graph" aria-selected="false">Graph</button>
-  <button role="tab" data-tab="index" aria-selected="false">Index</button>
+  <button role="tab" data-tab="explore" aria-selected="true" title="Explore (1)">Explore</button>
+  <button role="tab" data-tab="graph" aria-selected="false" title="Graph (2)">Graph</button>
+  <button role="tab" data-tab="index" aria-selected="false" title="Index (3)">Index</button>
 </div></div>
 
 <main>
@@ -465,12 +465,14 @@ function imgUrl(n, w) {
   return `${base}thumb/${parts[1]}/${parts[2]}/${file}/${Math.min(w, W)}px-${file}${/\.svg$/i.test(file) ? ".png" : ""}`;
 }
 const imgSource = n => { const p = n.img[0].split("/"); return (p[0] === "commons" ? "https://commons.wikimedia.org/wiki/File:" : "https://en.wikipedia.org/wiki/File:") + p[3]; };
-function hero(n) {
+// photos in a landscape-ish shape carry the title over them; maps, diagrams and odd shapes don't
+const overlayable = n => hasImg(n) && !/\.(svg|png|gif)$/i.test(n.img[0]) && n.img[1] / n.img[2] >= 1.15 && n.img[1] / n.img[2] <= 2.6;
+function hero(n, cap = "") {
   if (!hasImg(n)) return "";
   const [p, W, Hh] = n.img, ar = W / Hh, svg = /\.svg$/i.test(p);
   const fill = !svg && ar >= 1.15 && ar <= 2.6;
-  const box = fill ? Math.min(Math.max(ar, 1.45), 2.1) : 16 / 10;
-  return `<figure class="hero ${fill ? "fill" : "fit"}${svg ? " plate" : ""}" style="aspect-ratio:${box.toFixed(3)}">
+  const box = cap ? Math.min(Math.max(ar, 1.3), 1.75) : fill ? Math.min(Math.max(ar, 1.45), 2.1) : 16 / 10;
+  return `<figure class="hero ${fill ? "fill" : "fit"}${svg ? " plate" : ""}${cap ? " ov" : ""}" style="aspect-ratio:${box.toFixed(3)}">${cap ? `<div class="cap">${cap}</div>` : ""}
     <img src="${imgUrl(n, 960)}" alt="" loading="eager" decoding="async" onload="this.parentNode.classList.add('in')" onerror="this.parentNode.remove()">
     <a class="credit" href="${imgSource(n)}" target="_blank" rel="noopener" title="Image source">Wikimedia</a></figure>`;
 }
@@ -613,14 +615,15 @@ function renderInsp(n) {
   }
   const lin = lineage(n);
   el.innerHTML = `<article class="card fade">
-    <section class="blk intro">${hero(n)}<div>
-      <div class="meta-row"><button class="pill btn" data-cat="${n.cat}">${dot(n)}${CATS[n.cat][0]}</button><span class="pill">${ERAS[n.era][1]}</span></div>
-      <h1>${esc(n.name)}</h1>
-      <div class="when">${fmtYear(n.year)}</div>
+    <section class="blk intro${overlayable(n) ? " has-ov" : ""}">${hero(n, overlayable(n) ? `<h1>${esc(n.name)}</h1>` : "")}<div>
+      <div class="meta-row"><button class="pill btn" data-cat="${n.cat}">${dot(n)}${CATS[n.cat][0]}</button><span class="pill">${ERAS[n.era][1]}</span>${overlayable(n) ? `<span class="when inline">${fmtYear(n.year)}</span>` : ""}</div>
+      ${overlayable(n) ? "" : `<h1>${esc(n.name)}</h1>
+      <div class="when">${fmtYear(n.year)}</div>`}
     </div>
     <p class="lede">${esc(n.desc)}</p>
     <div class="actions">
       <a class="btn-p" href="${wikiUrl(n.wiki)}" target="_blank" rel="noopener">${ICON_EXT}Read on Wikipedia</a>
+      <button class="btn-s" data-graph="${n.id}">Show in Graph</button>
       <button class="btn-s" data-index="${n.id}">Show in Index</button>
     </div></section>
     <div class="stats">
@@ -641,6 +644,7 @@ $("#insp").addEventListener("click", e => {
   const m = e.target.closest("[data-more]"); if (m) { expanded.add(m.dataset.more); const y = $("#insp").scrollTop; renderInsp(path[path.length - 1]); $("#insp").scrollTop = y; $("#insp .card").classList.remove("fade"); return; }
   const c = e.target.closest("[data-cat]"); if (c) { catOn.clear(); catOn.add(c.dataset.cat); syncCats(); setTab("index"); return; }
   const ix = e.target.closest("[data-index]"); if (ix) { showInIndex(byId.get(ix.dataset.index)); return; }
+  const gx = e.target.closest("[data-graph]"); if (gx) { setTab("graph"); return; }
   const b = e.target.closest("[data-id]"); if (b) go(byId.get(b.dataset.id));
 });
 $("#pathbar").addEventListener("click", e => { const b = e.target.closest("[data-crumb]"); if (!b) return; const i = +b.dataset.crumb; i < 0 ? go(null) : go(path[i]); });
@@ -738,7 +742,9 @@ $("#open-search").addEventListener("click", () => openPalette());
 document.addEventListener("keydown", e => {
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); scrimEl ? closePalette() : openPalette(); return; }
   if (scrimEl) return;
-  if (e.key === "/" && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); openPalette(); }
+  if (/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName) || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key === "/") { e.preventDefault(); openPalette(); }
+  else if (e.key === "1" || e.key === "2" || e.key === "3") { e.preventDefault(); setTab(["explore", "graph", "index"][+e.key - 1]); }
 });
 
 /* ---------- tabs ---------- */
@@ -749,7 +755,7 @@ function setTab(t) {
   $("#explore").hidden = t !== "explore";
   $("#index").hidden = t !== "index";
   $("#graph").hidden = t !== "graph";
-  if (t === "index") renderIndex();
+  if (t === "index") { renderIndex(true); revealInIndex(path[path.length - 1]); }
   if (t === "graph") graphShow(path[path.length - 1]);
   store.set("tt-tab", t);
 }
@@ -809,7 +815,7 @@ function paintIndex(counts) {
     const it = VI[i];
     if (it.g != null) { h += `<div class="vgrp" style="top:${VO[i]}px">${ERAS[it.g][1]}<span>${fmt(gcounts[it.g] || 0)}</span></div>`; continue; }
     const n = it;
-    h += `<div class="vrow" role="button" tabindex="0" data-id="${n.id}" style="top:${VO[i]}px;height:${rh}px"><span class="y">${fmtYear(n.year).replace("c. ", "")}</span><span class="n">${esc(n.name)}</span><span class="f">${dot(n)}${CATS[n.cat][0]}</span><span class="d">${esc(n.desc)}</span><span class="l">${n.nDes ? fmt(n.nDes) : "–"}</span><a class="w" href="${wikiUrl(n.wiki)}" target="_blank" rel="noopener" title="Open “${esc(n.wiki)}” on Wikipedia" aria-label="Open on Wikipedia">${ICON_EXT}</a></div>`;
+    h += `<div class="vrow${n === path[path.length - 1] ? " cur" : ""}" role="button" tabindex="0" data-id="${n.id}" style="top:${VO[i]}px;height:${rh}px"><span class="y">${fmtYear(n.year).replace("c. ", "")}</span><span class="n">${esc(n.name)}</span><span class="f">${dot(n)}${CATS[n.cat][0]}</span><span class="d">${esc(n.desc)}</span><span class="l">${n.nDes ? fmt(n.nDes) : "–"}</span><a class="w" href="${wikiUrl(n.wiki)}" target="_blank" rel="noopener" title="Open “${esc(n.wiki)}” on Wikipedia" aria-label="Open on Wikipedia">${ICON_EXT}</a></div>`;
   }
   $("#vspace").innerHTML = h;
 }
@@ -817,11 +823,16 @@ let raf = 0; $("#vlist").addEventListener("scroll", () => { if (!raf) raf = requ
 window.addEventListener("resize", () => { if (tab === "index") renderIndex(true); });
 $("#vlist").addEventListener("click", e => { if (e.target.closest("a")) return; const r = e.target.closest(".vrow"); if (r) { setTab("explore"); go(byId.get(r.dataset.id)); } });
 $("#vlist").addEventListener("keydown", e => { if (e.key === "Enter") { const r = e.target.closest(".vrow"); if (r) { setTab("explore"); go(byId.get(r.dataset.id)); } } });
-function showInIndex(n) {
-  catOn.clear(); syncCats(); $("#f-era").value = ""; $("#f-text").value = ""; $("#f-sort").value = "year";
-  setTab("index");
-  const i = VI.indexOf(n); if (i >= 0) { $("#vlist").scrollTop = Math.max(0, VO[i] - $("#vlist").clientHeight / 3); paintIndex(); const r = $(`#vspace [data-id="${n.id}"]`); if (r) { r.style.background = "var(--bg-3)"; r.focus({ preventScroll: true }); } }
+// scroll the index to the selected technology; if the filters hide it, clear them first
+function revealInIndex(n, force) {
+  if (!n) return;
+  if (VI.indexOf(n) < 0 && force) { catOn.clear(); syncCats(); $("#f-era").value = ""; $("#f-text").value = ""; renderIndex(true); }
+  const i = VI.indexOf(n); if (i < 0) return;
+  const v = $("#vlist"), top = VO[i];
+  if (top < v.scrollTop || top > v.scrollTop + v.clientHeight - 60) v.scrollTop = Math.max(0, top - v.clientHeight / 3);
+  lastRange = ""; paintIndex();
 }
+function showInIndex(n) { setTab("index"); revealInIndex(n, true); }
 
 /*GRAPHJS*//* ---------- boot ---------- */
 {

@@ -173,3 +173,19 @@ body { font-size: 14.5px; }
   .gcard .gth { height: 90px; }
 }
 .gcard { overflow: hidden; }
+
+/* ---------- title over suitable photos ---------- */
+.hero.ov { background: #1c1b1a; }
+.hero.ov::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(to top, rgb(12 11 10 / .82) 0%, rgb(12 11 10 / .42) 34%, rgb(12 11 10 / 0) 64%); }
+.hero.ov::after { display: none; }
+.hero .cap { position: absolute; z-index: 2; left: 20px; right: 20px; bottom: 16px; }
+.hero .cap h1 { margin: 0; color: #f7f6f2; font-size: 40px; line-height: 1.03; text-wrap: balance; text-shadow: 0 1px 16px rgb(0 0 0 / .35); }
+.hero.ov .credit { top: 10px; bottom: auto; z-index: 2; }
+.blk.has-ov .meta-row { align-items: center; }
+.when.inline { margin: 0 0 0 auto; font: 500 13px var(--mono); color: var(--fg-3); }
+@media (max-width: 760px) { .hero .cap h1 { font-size: 32px; } .hero .cap { left: 16px; right: 16px; bottom: 14px; } }
+
+/* selected technology in the index */
+.vrow.cur { background: var(--row-sel); box-shadow: inset 2px 0 0 var(--fg); }
+.vrow.cur .n { font-weight: 600; }
