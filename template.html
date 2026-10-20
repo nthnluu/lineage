@@ -534,15 +534,15 @@ const SUGGEST = ["wheel", "writing", "printing_press", "steam_engine", "penicill
 const REEL = [
  {
   "id": "steam_locomotive",
-  "credit": "Arrival of a Train at La Ciotat (Lumière brothers, 1895)",
-  "page": "https://commons.wikimedia.org/wiki/File:Arrival_of_a_Train_at_La_Ciotat_(The_Lumi%C3%A8re_Brothers,_1895).webm",
-  "webm": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Arrival_of_a_Train_at_La_Ciotat_%28The_Lumi%C3%A8re_Brothers%2C_1895%29.webm",
-  "mp4": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/1a/Arrival_of_a_Train_at_La_Ciotat_%28The_Lumi%C3%A8re_Brothers%2C_1895%29.webm/Arrival_of_a_Train_at_La_Ciotat_%28The_Lumi%C3%A8re_Brothers%2C_1895%29.webm.360p.mpeg4.mov",
-  "start": 6,
+  "credit": "Arrival of a Train at La Ciotat (Lumière brothers, 1897)",
+  "page": "https://commons.wikimedia.org/wiki/File:L%27Arrivee_d%27un_train_en_gare_de_la_Ciotat,_summer_1897.ogv",
+  "webm": "https://upload.wikimedia.org/wikipedia/commons/6/6f/L%27Arrivee_d%27un_train_en_gare_de_la_Ciotat%2C_summer_1897.ogv",
+  "mp4": null,
+  "start": 4,
   "end": 40,
   "license": null,
   "color": false,
-  "orig": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Arrival_of_a_Train_at_La_Ciotat_%28The_Lumi%C3%A8re_Brothers%2C_1895%29.webm"
+  "orig": "https://upload.wikimedia.org/wikipedia/commons/6/6f/L%27Arrivee_d%27un_train_en_gare_de_la_Ciotat%2C_summer_1897.ogv"
  },
  {
   "id": "phonograph",
@@ -684,20 +684,20 @@ const CLOUDINARY = "daij1adry";
 const CLIP_SECONDS = 12;
 const conn = navigator.connection || {};
 const saveData = !!conn.saveData || /(^|-)2g$/.test(conn.effectiveType || "");
-const cld = (clip, opts, ext = "") => `https://res.cloudinary.com/${CLOUDINARY}/video/upload/${opts}/lineage/${clip.id}${ext}`;
+const cld = (clip, opts, ext = "") => `https://res.cloudinary.com/${CLOUDINARY}/video/upload/${opts}/${clip.id}_full${ext}`;
 const clipWidth = el => { const w = (el.clientWidth || 960) * Math.min(devicePixelRatio || 1, 2); return w <= 700 ? 640 : w <= 1100 ? 960 : 1280; };
 // Safari often claims WebM support but fails to play it, so Apple browsers always get H.264 MP4
 const isApple = /Apple/.test(navigator.vendor || "") || /iPhone|iPad|iPod/.test(navigator.userAgent);
 const useWebm = () => !isApple && !!document.createElement("video").canPlayType('video/webm; codecs="vp9"');
-const mp4Src = (clip, w) => cld(clip, `w_${w},c_limit,q_auto:eco,vc_auto,ac_none`, ".mp4");
+const mp4Src = (clip, w) => cld(clip, `so_${clip.start},du_${CLIP_SECONDS},w_${w},c_limit,q_auto:eco,vc_auto,ac_none`, ".mp4");
 function clipSource(clip, w) {
   if (CLOUDINARY) {
     const vp9 = useWebm();
-    return { src: cld(clip, `w_${w},c_limit,q_auto:eco${vp9 ? "" : ",vc_auto"},ac_none`, vp9 ? ".webm" : ".mp4"), start: 0, end: CLIP_SECONDS + 0.7 };
+    return { src: cld(clip, `so_${clip.start},du_${CLIP_SECONDS},w_${w},c_limit,q_auto:eco${vp9 ? "" : ",vc_auto"},ac_none`, vp9 ? ".webm" : ".mp4"), start: 0, end: CLIP_SECONDS - 0.2 };
   }
   return { src: useWebm() ? clip.webm : (clip.mp4 || clip.webm), start: clip.start, end: clip.start + CLIP_SECONDS };
 }
-const clipPoster = (clip, w) => CLOUDINARY ? cld(clip, `so_1,w_${w},c_limit,q_auto`, ".jpg") : "";
+const clipPoster = (clip, w) => CLOUDINARY ? cld(clip, `so_${clip.start + 1},w_${w},c_limit,q_auto`, ".jpg") : "";
 // plays the reel in every visible hero: ~10s per clip, crossfading between two video layers
 const reels = new Set();
 function startReels() {
@@ -743,9 +743,15 @@ function startReels() {
       caption(clip);
       setTimeout(() => { other.pause(); load(other, REEL[(st.i + 1) % REEL.length]); }, 1600);
     };
+    vids.forEach(v => { v.muted = true; v.defaultMuted = true; v.setAttribute("playsinline", ""); });
     load(vids[0], REEL[0]);
-    if (posterOnly) { reveal(); show(); }
-    else vids[0].addEventListener("loadeddata", () => { reveal(); show(); }, { once: true });
+    if (posterOnly || still) { reveal(); show(); }
+    else {
+      // start right away (muted autoplay); Safari may not report loaded data until playback starts
+      vids[0].addEventListener("playing", reveal, { once: true });
+      show();
+      setTimeout(reveal, 2500);
+    }
     if (!still) st.timer = setInterval(() => {
       if (!document.body.contains(root)) { clearInterval(st.timer); reels.delete(root); return; }
       if (root.offsetParent === null) return; // hidden copy (desktop vs phone)

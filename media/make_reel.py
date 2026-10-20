@@ -1,4 +1,7 @@
-"""Prepare the landing reel's clips and upload them to Cloudinary.
+"""Older cut-and-upload flow for the landing reel (kept for reference).
+
+The site now uploads full-resolution originals to Cloudinary as <id>_full and trims
+them on delivery (so_<start>,du_12), so this script is no longer needed for new clips.
 
 Usage: python3 media/make_reel.py <unsigned-upload-preset>
 
